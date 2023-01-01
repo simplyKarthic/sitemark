@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/screens/Register.dart';
+import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/login.dart';
 
 import 'database/database.dart';
-import 'database/user.dart';
+import 'models/user.dart';
 
 class NavDrawer extends StatelessWidget {
   late UserData user;
@@ -18,50 +19,7 @@ class NavDrawer extends StatelessWidget {
         children: <Widget>[
           SizedBox(
             height : MediaQuery.of(context).size.height*0.40,
-            child: (FirebaseAuth.instance.currentUser == null) ?
-            DrawerHeader(
-                decoration: BoxDecoration(
-                       color: Colors.blue,
-                     ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  CircleAvatar(
-                          radius: 52,
-                          backgroundImage: NetworkImage(
-                              'https://mir-s3-cdn-cf.behance.net/project_modules/fs/78c4af118001599.608076cf95739.jpg'),
-                        ),
-                  SizedBox(height: 10,),
-                  Text('Login to access your data across devices',style: TextStyle(fontSize: 12, color: Colors.white)),
-                  ButtonBar(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ElevatedButton(
-                        child: Text('Login'),
-                        style: ButtonStyle(
-                          backgroundColor:MaterialStateProperty.all(Colors.white),
-                          foregroundColor:MaterialStateProperty.all(Colors.blue),
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>login()));
-                        },
-                      ),
-                      ElevatedButton(
-                        child: Text('Register'),
-                        style: ButtonStyle(
-                          backgroundColor:MaterialStateProperty.all(Colors.white),
-                          foregroundColor:MaterialStateProperty.all(Colors.blue),
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>Register()));
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ) :
-            DrawerHeader(
+            child: DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -97,7 +55,7 @@ class NavDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
             child: ListTile(
               leading: Icon(Icons.verified_user),
-              title: Text('Edit Profile'),
+              title: Text('Chat room'),
               onTap: () => {Navigator.of(context).pop()},
             ),
           ),
@@ -105,7 +63,7 @@ class NavDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
             child: ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              title: Text('My Topics'),
               onTap: () => {Navigator.of(context).pop()},
             ),
           ),
@@ -121,7 +79,7 @@ class NavDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
             child: ListTile(
               leading: Icon(Icons.info),
-              title: Text('About'),
+              title: Text('Settings'),
               onTap: () => {Navigator.of(context).pop()},
             ),
           ),
@@ -135,16 +93,14 @@ class NavDrawer extends StatelessWidget {
                 print(FirebaseAuth.instance.currentUser?.phoneNumber),
                 print(FirebaseAuth.instance.currentUser?.email),
                 FirebaseAuth.instance.signOut(),
-                Navigator.of(context).pop()},
+              Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => entryScreen(),
+              ),
+              )
+              },
             ),
-          ),
-          TextButton(
-            onPressed: () async {
-              var urls = await Database(uid: user.uid).getUrls(user.uid);
-              print("urls");
-              print(urls);
-            },
-            child: const Text("Throw Test Exception"),
           ),
         ],
       ),

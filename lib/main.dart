@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/screens/addSite.dart';
+import 'package:sitemark/screens/entryScreen.dart';
+import 'package:sitemark/screens/login.dart';
+import 'package:sitemark/screens/mySites.dart';
 import 'database/auth_service.dart';
 import 'database/database.dart';
+import 'models/UrlData.dart';
 import 'navDrawer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -20,7 +24,7 @@ void main() async {
       title: "my app",
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-      body:myApp(),
+      body: entryScreen(),
       )
       )
   );
@@ -89,95 +93,11 @@ class _myAppState extends State<myApp> {
         child: Column(
           children: [
             SizedBox(height: 20,),
-            (gridView == true) ? siteGridContainer(context) : siteListContainer(context),
-            SizedBox(height: 20,),
-            ElevatedButton(
-                onPressed: () async {
-              var profileres = await Database(uid: 'n0cI5ulmrHWUAa7a8I4jKgZMM3l1').getUrls('n0cI5ulmrHWUAa7a8I4jKgZMM3l1');
-              print('bool ${profileres['Name']}');
-              print('bool ${profileres['images']}');
-              print('bool ${profileres['link']}');
-            }
-                , child: Text('onclick'))
+            Text("welcome to my app")
           ],
         ),
 
       ),
     );
-  }
-}
-
-siteGridContainer(BuildContext context){
-  return GestureDetector(
-    onTap: () {
-      _launchURL('https://stackoverflow.com/');
-    },
-    child: Container(
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(109, 215, 253, 100),
-        borderRadius: BorderRadius.all(Radius.circular(15.0)),
-      ),
-      height: 100,
-      width: 100,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image(image: NetworkImage(
-            'https://icon.horse/icon/stackoverflow.com',
-          ),
-            height: 50,
-            width: 50,
-          ),
-          Text("Stack Overflow", style: TextStyle(
-              fontSize: 17,
-          ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-siteListContainer(BuildContext context){
-  return GestureDetector(
-    onTap: () {
-      _launchURL('https://stackoverflow.com/');
-    },
-    child: Container(
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(109, 215, 253, 100),
-        borderRadius: BorderRadius.all(Radius.circular(15.0)),
-      ),
-      height: 80,
-      width: MediaQuery.of(context).size.width*0.95,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Image(image: NetworkImage(
-            'https://icon.horse/icon/stackoverflow.com',
-          ),
-            height: 50,
-            width: 50,
-          ),
-          Text("Stack Overflow", style: TextStyle(
-            fontSize: 17,
-          ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-
-_launchURL(url) async {
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
   }
 }

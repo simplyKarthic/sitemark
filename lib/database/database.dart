@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sitemark/database/user.dart';
+import 'package:sitemark/models/user.dart';
+
+import '../models/UrlData.dart';
 
 class Database{
   final String uid;
@@ -29,15 +31,23 @@ class Database{
     }
   }
 
-  // Stream<UserData> get vendorDetailsStream {
-  //   return userCollection.doc(uid).snapshots().map((snap) => UserData.fromFirestore(snap));
-  // }
+  Stream<UrlData> get remoteConfigData {
+    var fetchResponse = userCollection.doc(uid).collection('Sites').doc('url').snapshots().map((snap) => UrlData.fromJson(snap.data()));
+    print("fetchResponse: ${fetchResponse.length}");
+    return fetchResponse;
+  }
 
-  Future getUrls(String uid) async{
+  Future getUrls() async{
     try{
       var urlData = await userCollection.doc(uid).collection('Sites').doc('url').get();
-      print(" $urlData");
-      return urlData;
+      print("urlData: $urlData");
+      if(!urlData.exists){
+        return [];
+      }else if(urlData.data() == null){
+        return null;
+      }else{
+        return urlData.data()?.entries.map((e) => UrlData.fromJson(e.value)).toList();
+      }
     }catch(err){
       print('while getting url: $err');
       return null;

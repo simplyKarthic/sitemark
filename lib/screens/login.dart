@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../database/auth_service.dart';
 import '../main.dart';
+import 'entryScreen.dart';
 
 class login extends StatefulWidget {
   const login({Key? key}) : super(key: key);
@@ -42,6 +43,12 @@ class _loginState extends State<login> {
               onPressed: () async {
                 var result = await AuthService().RegisterWithGoogle();
                 print("result : $result");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => entryScreen(),
+                  ),
+                );
               },
             ),
             ElevatedButton(

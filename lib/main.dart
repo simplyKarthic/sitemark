@@ -19,19 +19,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  runApp(
-      const MaterialApp(
+  runApp(const MaterialApp(
       title: "my app",
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-      body: entryScreen(),
-      )
-      )
-  );
+        body: entryScreen(),
+      )));
 }
 
 class myApp extends StatefulWidget {
-  const myApp( {Key? key}) : super(key: key);
+  const myApp({Key key}) : super(key: key);
 
   @override
   State<myApp> createState() => _myAppState();
@@ -51,52 +48,29 @@ class _myAppState extends State<myApp> {
         backgroundColor: Colors.blue,
         actions: <Widget>[
           if (FirebaseAuth.instance.currentUser != null)
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.white,
+            IconButton(
+              icon: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(title: const Text('Add your website'), scrollable: true, content: addSite(context)));
+              },
             ),
-            onPressed: ()  {
-              showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Add your website'),
-                      scrollable: true,
-                      content: addSite(context)
-                  )
-              );
-            },
-          ),
           //onPressed: ()  => _scaffoldKey.currentState?.openDrawer(),
-          (gridView == true) ?
-          IconButton(
-            icon: Icon(
-              Icons.list_alt_outlined,
-              color: Colors.white,
-            ),
-            onPressed: ()  {
-              setState(() { gridView = false; });
-            },
-          ) :
-          IconButton(
-            icon: Icon(
-              Icons.grid_view,
-              color: Colors.white,
-            ),
-            onPressed: ()  async {
-              setState(() { gridView = true; });
-            },
-          ),
         ],
       ),
       body: Center(
         child: Column(
           children: [
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Text("welcome to my app")
           ],
         ),
-
       ),
     );
   }

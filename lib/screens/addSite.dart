@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class addSite extends StatefulWidget {
-  const addSite(BuildContext context, {Key? key}) : super(key: key);
+  const addSite(BuildContext context, {Key key}) : super(key: key);
 
   @override
   State<addSite> createState() => _addSiteState();
@@ -67,8 +67,7 @@ class _addSiteState extends State<addSite> {
                       ElevatedButton(
                         child: Text("Cancel"),
                         onPressed: () {
-                          Navigator.of(context, rootNavigator: true)
-                              .pop('Cancel');
+                          Navigator.of(context, rootNavigator: true).pop('Cancel');
                         },
                       ),
                       SizedBox(
@@ -77,8 +76,8 @@ class _addSiteState extends State<addSite> {
                       ElevatedButton(
                         child: Text("Add"),
                         onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
+                          if (_formKey.currentState.validate()) {
+                            _formKey.currentState.save();
                             print("urlName: $urlName, url $url");
                             Navigator.pop(context);
                           }

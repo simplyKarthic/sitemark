@@ -6,7 +6,7 @@ import '../models/UrlData.dart';
 class Database{
   final String uid;
 
-  Database({required this.uid});
+  Database({this.uid});
 
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('User');
 
@@ -31,10 +31,22 @@ class Database{
     }
   }
 
-  Stream<UrlData> get remoteConfigData {
-    var fetchResponse = userCollection.doc(uid).collection('Sites').doc('url').snapshots().map((snap) => UrlData.fromJson(snap.data()));
-    print("fetchResponse: ${fetchResponse.length}");
-    return fetchResponse;
+
+
+  Future<List<UrlData>> get getAccountPostData async {
+    try{
+      List<UrlData> accountPost = [];
+      var fetchResponse = await userCollection.doc(uid).collection('Sites').doc('url').get();
+      if(fetchResponse.data() == null){
+        accountPost = [];
+      }else{
+        accountPost = fetchResponse.data().entries.map((e) => UrlData.fromJson(e.value)).toList();
+      }
+      return accountPost;
+    }catch(err){
+      return null;
+    }
+
   }
 
   Future getUrls() async{

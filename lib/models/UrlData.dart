@@ -1,21 +1,3 @@
-
-class AccountUrlData{
-
-  AccountUrlData({required this.urlId});
-
-  List<UrlData> urlId = [];
-
-  factory AccountUrlData.fromJson(Map<String, dynamic> json) =>
-      AccountUrlData(
-        urlId: List<UrlData>.from(json["urlId"].map((x) => UrlData.fromJson(x))),
-      );
-
-}
-
-
-
-
-
 class UrlData{
 
   int count;
@@ -24,15 +6,15 @@ class UrlData{
   String name;
 
   UrlData({
-     required this.count,
-    required this.image,
-    required this.link,
-    required this.name,
+      this.count,
+     this.image,
+     this.link,
+     this.name,
   });
 
-  factory UrlData.fromJson(Map<String, dynamic>? data) =>
+  factory UrlData.fromJson(Map<String, dynamic> data) =>
       UrlData(
-          count: data!['count'] ?? 0,
+          count: data['count'] ?? 0,
           image: data['image'] ?? '',
           link: data['link'] ?? '',
           name: data['name'] ?? ''
@@ -46,4 +28,12 @@ class UrlData{
   };
 
 
+  factory UrlData.initial(){
+    return UrlData(
+      count: 0,
+      image: '',
+      link: 'sitemark.com',
+      name: 'sitemark'
+    );
+  }
 }

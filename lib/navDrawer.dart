@@ -4,21 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:sitemark/screens/Register.dart';
 import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/login.dart';
+import 'package:sitemark/screens/mySites.dart';
 
 import 'database/database.dart';
 import 'models/user.dart';
 
 class NavDrawer extends StatelessWidget {
-  late UserData user;
+  UserData user;
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width*0.8,
+      width: MediaQuery.of(context).size.width * 0.8,
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           SizedBox(
-            height : MediaQuery.of(context).size.height*0.40,
+            height: MediaQuery.of(context).size.height * 0.40,
             child: DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
@@ -28,8 +30,7 @@ class NavDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 52,
-                    backgroundImage: NetworkImage(
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b'),
+                    backgroundImage: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b'),
                   ),
                   Text(
                     'Bill gates',
@@ -64,7 +65,7 @@ class NavDrawer extends StatelessWidget {
             child: ListTile(
               leading: Icon(Icons.settings),
               title: Text('My Topics'),
-              onTap: () => {Navigator.of(context).pop()},
+              onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => MySites()))},
             ),
           ),
           Padding(
@@ -84,28 +85,26 @@ class NavDrawer extends StatelessWidget {
             ),
           ),
           if (FirebaseAuth.instance.currentUser != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
-            child: ListTile(
-              leading: Icon(Icons.exit_to_app),
-              title: Text('Logout'),
-              onTap: () => {
-                print(FirebaseAuth.instance.currentUser?.phoneNumber),
-                print(FirebaseAuth.instance.currentUser?.email),
-                FirebaseAuth.instance.signOut(),
-              Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => entryScreen(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
+              child: ListTile(
+                leading: Icon(Icons.exit_to_app),
+                title: Text('Logout'),
+                onTap: () => {
+                  print(FirebaseAuth.instance.currentUser?.phoneNumber),
+                  print(FirebaseAuth.instance.currentUser?.email),
+                  FirebaseAuth.instance.signOut(),
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => entryScreen(),
+                    ),
+                  )
+                },
               ),
-              )
-              },
             ),
-          ),
         ],
       ),
     );
   }
-
 }
-

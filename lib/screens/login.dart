@@ -6,7 +6,7 @@ import '../main.dart';
 import 'entryScreen.dart';
 
 class login extends StatefulWidget {
-  const login({Key? key}) : super(key: key);
+  const login({Key key}) : super(key: key);
 
   @override
   State<login> createState() => _loginState();
@@ -22,7 +22,6 @@ class _loginState extends State<login> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -53,15 +52,11 @@ class _loginState extends State<login> {
             ),
             ElevatedButton(
               child: Text('Email'),
-              onPressed: () => showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => loginwithemail(context)),
+              onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => loginwithemail(context)),
             ),
             ElevatedButton(
               child: Text('Phone'),
-              onPressed: () => showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => loginwithphone(context)),
+              onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => loginwithphone(context)),
             ),
           ],
         )));
@@ -124,8 +119,7 @@ class _loginState extends State<login> {
                         ElevatedButton(
                           child: Text("Cancel"),
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('Cancel');
+                            Navigator.of(context, rootNavigator: true).pop('Cancel');
                           },
                         ),
                         SizedBox(
@@ -134,14 +128,12 @@ class _loginState extends State<login> {
                         ElevatedButton(
                           child: Text("Submit"),
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
                               print("email: $email, password $password");
-                              var result = await AuthService()
-                                  .registerWithEmailAndPassword(email, password);
+                              var result = await AuthService().registerWithEmailAndPassword(email, password);
                               print("Result :   $result");
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('Submit');
+                              Navigator.of(context, rootNavigator: true).pop('Submit');
                             }
                           },
                         ),
@@ -212,8 +204,7 @@ class _loginState extends State<login> {
                         ElevatedButton(
                           child: Text("Cancel"),
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('Cancel');
+                            Navigator.of(context, rootNavigator: true).pop('Cancel');
                           },
                         ),
                         SizedBox(
@@ -222,23 +213,18 @@ class _loginState extends State<login> {
                         ElevatedButton(
                           child: Text("Submit"),
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
                               phone = '+91$phone';
                               FirebaseAuth.instance.verifyPhoneNumber(
                                 phoneNumber: phone,
                                 timeout: Duration(seconds: 30),
-                                verificationCompleted:
-                                    (AuthCredential credential) async {
-                                  var result = await FirebaseAuth.instance
-                                      .signInWithCredential(credential);
-                                  User? user = result.user;
+                                verificationCompleted: (AuthCredential credential) async {
+                                  var result = await FirebaseAuth.instance.signInWithCredential(credential);
+                                  User user = result.user;
                                   if (user != null) {
                                     print("userData: $user");
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => myApp()));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
                                   } else {
                                     print("Error");
                                   }
@@ -248,8 +234,7 @@ class _loginState extends State<login> {
                                 verificationFailed: (authException) {
                                   print(authException.message);
                                 },
-                                codeSent: (String verificationId,
-                                    [int? forceResendingToken]) async {
+                                codeSent: (String verificationId, [int forceResendingToken]) async {
                                   showDialog(
                                       context: context,
                                       barrierDismissible: false,
@@ -270,26 +255,13 @@ class _loginState extends State<login> {
                                             ElevatedButton(
                                               child: Text("Confirm"),
                                               onPressed: () async {
-                                                final code =
-                                                    _codeController.text.trim();
-                                                AuthCredential credential =
-                                                    PhoneAuthProvider
-                                                        .credential(
-                                                            verificationId:
-                                                                verificationId,
-                                                            smsCode: code);
-                                                var result = await FirebaseAuth
-                                                    .instance
-                                                    .signInWithCredential(
-                                                        credential);
-                                                User? user = result.user;
+                                                final code = _codeController.text.trim();
+                                                AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: code);
+                                                var result = await FirebaseAuth.instance.signInWithCredential(credential);
+                                                User user = result.user;
 
                                                 if (user != null) {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              myApp()));
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
                                                 } else {
                                                   print("Error");
                                                 }
@@ -299,8 +271,7 @@ class _loginState extends State<login> {
                                         );
                                       });
                                 },
-                                codeAutoRetrievalTimeout:
-                                    (String verificationId) {
+                                codeAutoRetrievalTimeout: (String verificationId) {
                                   verificationId = verificationId;
                                   print(verificationId);
                                   print("Timout");
@@ -318,5 +289,4 @@ class _loginState extends State<login> {
       ),
     );
   }
-
 }

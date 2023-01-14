@@ -6,9 +6,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../database/auth_service.dart';
 import '../main.dart';
 
-
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({Key key}) : super(key: key);
 
   @override
   State<Register> createState() => _RegisterState();
@@ -32,34 +31,30 @@ class _RegisterState extends State<Register> {
         ),
         body: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "Register ",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text("Create a account with your credentials"),
-                ElevatedButton(
-                  child: Text('Google'),
-                  onPressed: () async {
-                    var result = await AuthService().RegisterWithGoogle();
-                    print("result : ${result}");
-                  },
-                ),
-                ElevatedButton(
-                  child: Text('Email'),
-                  onPressed: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => Registerwithemail(context)),
-                ),
-                ElevatedButton(
-                  child: Text('Phone'),
-                  onPressed: () => showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => Registerwithphone(context)),
-                ),
-              ],
-            )));
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              "Register ",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text("Create a account with your credentials"),
+            ElevatedButton(
+              child: Text('Google'),
+              onPressed: () async {
+                var result = await AuthService().RegisterWithGoogle();
+                print("result : ${result}");
+              },
+            ),
+            ElevatedButton(
+              child: Text('Email'),
+              onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => Registerwithemail(context)),
+            ),
+            ElevatedButton(
+              child: Text('Phone'),
+              onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => Registerwithphone(context)),
+            ),
+          ],
+        )));
   }
 
   Registerwithemail(BuildContext context) {
@@ -119,8 +114,7 @@ class _RegisterState extends State<Register> {
                         ElevatedButton(
                           child: Text("Cancel"),
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('Cancel');
+                            Navigator.of(context, rootNavigator: true).pop('Cancel');
                           },
                         ),
                         SizedBox(
@@ -129,14 +123,12 @@ class _RegisterState extends State<Register> {
                         ElevatedButton(
                           child: Text("Submit"),
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
                               print("email: $email, password $password");
-                              var result = await AuthService()
-                                  .registerWithEmailAndPassword(email, password);
+                              var result = await AuthService().registerWithEmailAndPassword(email, password);
                               print("Result :   $result");
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('Submit');
+                              Navigator.of(context, rootNavigator: true).pop('Submit');
                             }
                           },
                         ),
@@ -207,8 +199,7 @@ class _RegisterState extends State<Register> {
                         ElevatedButton(
                           child: Text("Cancel"),
                           onPressed: () {
-                            Navigator.of(context, rootNavigator: true)
-                                .pop('Cancel');
+                            Navigator.of(context, rootNavigator: true).pop('Cancel');
                           },
                         ),
                         SizedBox(
@@ -217,23 +208,18 @@ class _RegisterState extends State<Register> {
                         ElevatedButton(
                           child: Text("Submit"),
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
                               phone = '+91$phone';
                               FirebaseAuth.instance.verifyPhoneNumber(
                                 phoneNumber: phone,
                                 timeout: Duration(seconds: 30),
-                                verificationCompleted:
-                                    (AuthCredential credential) async {
-                                  var result = await FirebaseAuth.instance
-                                      .signInWithCredential(credential);
-                                  User? user = result.user;
+                                verificationCompleted: (AuthCredential credential) async {
+                                  var result = await FirebaseAuth.instance.signInWithCredential(credential);
+                                  User user = result.user;
                                   if (user != null) {
                                     print("userData: $user");
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => myApp()));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
                                   } else {
                                     print("Error");
                                   }
@@ -243,8 +229,7 @@ class _RegisterState extends State<Register> {
                                 verificationFailed: (authException) {
                                   print(authException.message);
                                 },
-                                codeSent: (String verificationId,
-                                    [int? forceResendingToken]) async {
+                                codeSent: (String verificationId, [int forceResendingToken]) async {
                                   showDialog(
                                       context: context,
                                       barrierDismissible: false,
@@ -265,26 +250,13 @@ class _RegisterState extends State<Register> {
                                             ElevatedButton(
                                               child: Text("Confirm"),
                                               onPressed: () async {
-                                                final code =
-                                                _codeController.text.trim();
-                                                AuthCredential credential =
-                                                PhoneAuthProvider
-                                                    .credential(
-                                                    verificationId:
-                                                    verificationId,
-                                                    smsCode: code);
-                                                var result = await FirebaseAuth
-                                                    .instance
-                                                    .signInWithCredential(
-                                                    credential);
-                                                User? user = result.user;
+                                                final code = _codeController.text.trim();
+                                                AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: code);
+                                                var result = await FirebaseAuth.instance.signInWithCredential(credential);
+                                                User user = result.user;
 
                                                 if (user != null) {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              myApp()));
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
                                                 } else {
                                                   print("Error");
                                                 }
@@ -294,8 +266,7 @@ class _RegisterState extends State<Register> {
                                         );
                                       });
                                 },
-                                codeAutoRetrievalTimeout:
-                                    (String verificationId) {
+                                codeAutoRetrievalTimeout: (String verificationId) {
                                   verificationId = verificationId;
                                   print(verificationId);
                                   print("Timout");
@@ -313,6 +284,4 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
-
-
 }

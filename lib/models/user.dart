@@ -8,7 +8,7 @@ class UserData {
   String profilePic;
   String authby;
 
-  UserData({required this.uid, required this.email, required this.isUserVerified, required this.phone, required this.profilePic, required this.authby});
+  UserData({ this.uid,  this.email,  this.isUserVerified,  this.phone,  this.profilePic, this.authby});
 
   factory UserData.error() {
     return UserData(uid: '', email: '', isUserVerified: false, phone: '', profilePic: '', authby: '');

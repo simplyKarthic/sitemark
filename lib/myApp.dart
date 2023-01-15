@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
                 value: AuthService().user,
               catchError: (_, err){
                 print(err.toString() + " -  get UserData StreamProvider");
-                return UserData.initial();
+                return null;
               },
             ),
             ProxyProvider<UserData, ProxyData>(

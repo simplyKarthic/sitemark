@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sitemark/screens/QuotesData.dart';
 import 'package:sitemark/screens/Register.dart';
 import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/login.dart';
@@ -73,9 +74,9 @@ class NavDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
             child: ListTile(
-              leading: Icon(Icons.border_color),
-              title: Text('Feedback'),
-              onTap: () => {Navigator.of(context).pop()},
+              leading: Icon(Icons.format_quote_sharp),
+              title: const Text('philosophy'),
+              onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => QuotesData()))},
             ),
           ),
           Padding(

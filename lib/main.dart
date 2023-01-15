@@ -2,17 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/myApp.dart';
 import 'package:sitemark/screens/addSite.dart';
-import 'package:sitemark/screens/entryScreen.dart';
-import 'package:sitemark/screens/login.dart';
-import 'package:sitemark/screens/mySites.dart';
-import 'database/auth_service.dart';
-import 'database/database.dart';
-import 'models/UrlData.dart';
 import 'navDrawer.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 bool gridView = false;
 

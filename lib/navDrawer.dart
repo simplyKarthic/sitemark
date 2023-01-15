@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sitemark/screens/Register.dart';
 import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/login.dart';
@@ -14,6 +15,7 @@ class NavDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UserData user = Provider.of<UserData>(context);
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.8,
       child: ListView(
@@ -63,9 +65,9 @@ class NavDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
             child: ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('My Topics'),
-              onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => MySites()))},
+              leading: Icon(Icons.post_add),
+              title: const Text('My Post'),
+              onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => MySites(user)))},
             ),
           ),
           Padding(

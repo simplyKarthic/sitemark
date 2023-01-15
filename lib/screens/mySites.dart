@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../database/database.dart';
-import '../models/user.dart';
 import '../models/UrlData.dart';
+import '../models/user.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 
 class MySites extends StatefulWidget {
-  const MySites({Key key}) : super(key: key);
+  const MySites(UserData user, {Key key}) : super(key: key);
 
   @override
   State<MySites> createState() => _MySitesState();
@@ -17,6 +19,8 @@ class _MySitesState extends State<MySites> {
   bool gridView = true;
   @override
   Widget build(BuildContext context) {
+    UserData user = Provider.of<UserData>(context);
+    print("userdata: ${user.uid}");
     return Scaffold(
       appBar: AppBar(actions: <Widget>[
         (gridView == true)
@@ -45,9 +49,19 @@ class _MySitesState extends State<MySites> {
       ]),
       body: Center(
         child: FutureBuilder(
-          future: Database(uid: 'n0cI5ulmrHWUAa7a8I4jKgZMM3l1').getAccountPostData,
+          future: Database(uid: user.uid).getAccountPostData,
           builder: (BuildContext context, AsyncSnapshot<List<UrlData>> snapshot) {
             List<UrlData> postData = snapshot.data;
+            if (postData == null || !snapshot.hasData){
+              return Center(
+                child: Container(
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    color: Colors.blueAccent,
+                    size: 200,
+                  ),
+                ),
+              );
+            }
             if (gridView == true){
               return GridView.builder(
                 itemCount: snapshot.data.length,

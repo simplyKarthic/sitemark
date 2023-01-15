@@ -3,35 +3,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserData {
   String uid;
   String email;
-  bool isUserVerified;
-  String phone;
-  String profilePic;
-  String authby;
 
-  UserData({ this.uid,  this.email,  this.isUserVerified,  this.phone,  this.profilePic, this.authby});
+  UserData({ this.uid,  this.email});
 
   factory UserData.error() {
-    return UserData(uid: '', email: '', isUserVerified: false, phone: '', profilePic: '', authby: '');
+    return UserData(uid: '', email: '');
   }
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
         uid: json['uid'] ?? '',
-        email: json['email'],
-        isUserVerified: json['isUserVerified'],
-        phone: json['phone'],
-        profilePic: json['profilePic'],
-        authby: json['authby']);
+        email: json['email'] ?? '',
+    );
   }
 
-  Map<String, dynamic> toJson() {
-    final data = <String, dynamic>{};
-    data['uid'] = uid;
-    data['email'] = email;
-    data['isUserVerified'] = isUserVerified;
-    data['phone'] = phone;
-    data['profilePic'] = profilePic;
-    data['authby'] = authby;
-    return data;
+  // Map<String, dynamic> toJson() {
+  //   final data = <String, dynamic>{};
+  //   data['uid'] = uid;
+  //   data['email'] = email;
+  //   return data;
+  // }
+
+  factory UserData.initial(){
+    return UserData(
+      uid: '',
+      email: '',
+    );
   }
+
 }

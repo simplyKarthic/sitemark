@@ -1,9 +1,9 @@
 class UrlData{
 
-  int count;
-  String image;
-  String link;
-  String name;
+  final int count;
+  final String image;
+  final String link;
+  final String name;
 
   UrlData({
       this.count,

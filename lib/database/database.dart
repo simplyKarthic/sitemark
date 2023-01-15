@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:sitemark/models/user.dart';
 
 import '../models/UrlData.dart';
@@ -6,7 +7,7 @@ import '../models/UrlData.dart';
 class Database{
   final String uid;
 
-  Database({this.uid});
+  Database({ @required this.uid});
 
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('User');
 
@@ -44,27 +45,11 @@ class Database{
       }
       return accountPost;
     }catch(err){
+      print("getAccountPostData error: $err");
       return null;
     }
 
   }
 
-  Future getUrls() async{
-    try{
-      var urlData = await userCollection.doc(uid).collection('Sites').doc('url').get();
-      print("urlData: $urlData");
-      if(!urlData.exists){
-        return [];
-      }else if(urlData.data() == null){
-        return null;
-      }else{
-        return urlData.data()?.entries.map((e) => UrlData.fromJson(e.value)).toList();
-      }
-    }catch(err){
-      print('while getting url: $err');
-      return null;
-    }
-
-  }
 
 }

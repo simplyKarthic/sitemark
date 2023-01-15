@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sitemark/myApp.dart';
 import 'package:sitemark/screens/addSite.dart';
 import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/login.dart';
@@ -18,13 +19,7 @@ bool gridView = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  runApp(const MaterialApp(
-      title: "my app",
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: entryScreen(),
-      )));
+  runApp(const MyApp());
 }
 
 class myApp extends StatefulWidget {

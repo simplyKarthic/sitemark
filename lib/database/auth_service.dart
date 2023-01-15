@@ -10,6 +10,14 @@ import 'database.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  UserData _userFromFirebaseUser(User user) {
+    return user != null ? UserData(uid: user.uid, email: user.email) : null;
+  }
+
+  Stream<UserData> get user {
+    return _auth.authStateChanges().map(_userFromFirebaseUser);
+  }
+
   Future<User> authenticateWithGoogle() async {
     try {
       final GoogleSignInAccount googleUser = await GoogleSignIn(scopes: <String>["email"]).signIn();
@@ -37,11 +45,8 @@ class AuthService {
 
         return UserData(
             uid: user.uid,
-            email: user.email.toString(),
-            isUserVerified: false,
-            phone: user.phoneNumber.toString(),
-            profilePic: user.photoURL.toString(),
-            authby: 'Google');
+            email: user.email.toString()
+        );
       }
     } catch (error) {
       return error;

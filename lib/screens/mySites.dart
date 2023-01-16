@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../database/database.dart';
 import '../models/UrlData.dart';
 import '../models/user.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 
 class MySites extends StatefulWidget {
@@ -20,7 +19,6 @@ class _MySitesState extends State<MySites> {
   @override
   Widget build(BuildContext context) {
     UserData user = Provider.of<UserData>(context);
-    print("userdata: ${user.uid}");
     return Scaffold(
       appBar: AppBar(actions: <Widget>[
         (gridView == true)
@@ -53,14 +51,7 @@ class _MySitesState extends State<MySites> {
           builder: (BuildContext context, AsyncSnapshot<List<UrlData>> snapshot) {
             List<UrlData> postData = snapshot.data;
             if (postData == null || !snapshot.hasData){
-              return Center(
-                child: Container(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                    color: Colors.blueAccent,
-                    size: 200,
-                  ),
-                ),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
             if (gridView == true){
               return GridView.builder(

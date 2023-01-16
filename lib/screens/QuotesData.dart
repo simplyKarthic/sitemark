@@ -38,6 +38,15 @@ class _QuotesDataState extends State<QuotesData> {
 
   @override
   Widget build(BuildContext context) {
+
+    int colorIndex = 0;
+    Color _two = Color(0xffA3DEE9);
+    Color _four = Color(0xffDCECFF);
+    Color _five = Color(0xffC5ABFF);
+    Color _three = Color(0xffFAD764);
+    Color _one = Color(0xffFFE9ED);
+    List mixColors = [_one, _two, _three, _four, _five];
+
     return Scaffold(
       drawer: NavDrawer(),
       appBar: AppBar(
@@ -52,15 +61,23 @@ class _QuotesDataState extends State<QuotesData> {
                 itemCount: _quotes.length,
                 itemBuilder: (context, index) {
                   List tags = _quotes[index]['tags'];
+
+                  if(colorIndex < 4){
+                    colorIndex +=1;
+                  }else{
+                    colorIndex = 0;
+                  }
+
                   return Card(
-                    color: Colors.white70,
+                    margin: EdgeInsets.all(10),
+                    color: mixColors[colorIndex],
                     elevation: 8.0,
                     child: ListTile(
                       title: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
-                            Text(_quotes[index]['author'], style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600, fontSize: 20)),
+                            Text(_quotes[index]['author'], style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 20)),
                             SizedBox(
                               height: 15,
                             ),
@@ -77,8 +94,8 @@ class _QuotesDataState extends State<QuotesData> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             (tags.isNotEmpty) ?
-                            Text("#${tags[0]}", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)):
-                            Text("#philosophy", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600))
+                            Text("#${tags[0]}", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600)):
+                            Text("#philosophy", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600))
 
                           ],
                         ),

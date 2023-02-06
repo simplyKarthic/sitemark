@@ -11,11 +11,10 @@ class Database{
 
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('User');
 
-  Future<bool> addUser(String name, String email, String phone,String profilePic,String authby) async {
+  Future<bool> addUser(String name, String email, String profilePic,String authby) async {
     try{
       await userCollection.doc(uid).set({
         'name': name,
-        'phone' : phone,
         'uid' : uid,
         'profilepic': profilePic,
         'createdDate': Timestamp.now(),

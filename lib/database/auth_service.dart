@@ -38,10 +38,9 @@ class AuthService {
     try {
       User user = await authenticateWithGoogle();
       if (user == null) return null;
-
       if (user != null) {
         bool profileres = await Database(uid: user.uid)
-            .addUser(user.displayName.toString(), user.email.toString(), user.phoneNumber.toString(), user.photoURL.toString(), 'Google');
+            .addUser(user.displayName.toString(), user.email.toString(), user.photoURL.toString(), 'Google');
 
         return UserData(
             uid: user.uid,

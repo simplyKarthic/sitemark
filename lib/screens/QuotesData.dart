@@ -96,7 +96,6 @@ class _QuotesDataState extends State<QuotesData> {
                             (tags.isNotEmpty) ?
                             Text("#${tags[0]}", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600)):
                             Text("#philosophy", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600))
-
                           ],
                         ),
                       ),

@@ -1,6 +1,6 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:sitemark/screens/entryScreen.dart';
+import 'package:sitemark/routes.dart';
 import 'package:provider/provider.dart';
 import 'database/auth_service.dart';
 import 'models/ProxyData.dart';
@@ -33,12 +33,11 @@ class MyApp extends StatelessWidget {
               },
             )
           ],
-          child : const MaterialApp(
+          child : MaterialApp(
           title: "my app",
           debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            body: entryScreen(),
-          ),
+          initialRoute: '/entry',
+          onGenerateRoute: (settings) => RouteGenerator.generateRoute(settings),
         )
         );
       }

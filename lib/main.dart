@@ -45,7 +45,6 @@ class _myAppState extends State<myApp> {
                     builder: (BuildContext context) => AlertDialog(title: const Text('Add your website'), scrollable: true, content: addSite(context)));
               },
             ),
-          //onPressed: ()  => _scaffoldKey.currentState?.openDrawer(),
         ],
       ),
       body: Center(

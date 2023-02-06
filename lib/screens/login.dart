@@ -41,7 +41,7 @@ class _loginState extends State<login> {
               child: Text('Google'),
               onPressed: () async {
                 var result = await AuthService().RegisterWithGoogle();
-                print("result : $result");
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -53,10 +53,6 @@ class _loginState extends State<login> {
             ElevatedButton(
               child: Text('Email'),
               onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => loginwithemail(context)),
-            ),
-            ElevatedButton(
-              child: Text('Phone'),
-              onPressed: () => showDialog<String>(context: context, builder: (BuildContext context) => loginwithphone(context)),
             ),
           ],
         )));
@@ -146,147 +142,145 @@ class _loginState extends State<login> {
       ),
     );
   }
-
-  loginwithphone(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Login with email'),
-      scrollable: true,
-      content: Stack(
-        children: <Widget>[
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.email),
-                      hintText: '+91 ',
-                      labelText: 'phone *',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      phone = value;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.password),
-                      hintText: '*** ***',
-                      labelText: 'OTP *',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      otp = value;
-                    },
-                  ),
-                ),
-                Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ButtonBar(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton(
-                          child: Text("Cancel"),
-                          onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop('Cancel');
-                          },
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        ElevatedButton(
-                          child: Text("Submit"),
-                          onPressed: () async {
-                            if (_formKey.currentState.validate()) {
-                              _formKey.currentState.save();
-                              phone = '+91$phone';
-                              FirebaseAuth.instance.verifyPhoneNumber(
-                                phoneNumber: phone,
-                                timeout: Duration(seconds: 30),
-                                verificationCompleted: (AuthCredential credential) async {
-                                  var result = await FirebaseAuth.instance.signInWithCredential(credential);
-                                  User user = result.user;
-                                  if (user != null) {
-                                    print("userData: $user");
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
-                                  } else {
-                                    print("Error");
-                                  }
-
-                                  //This callback would gets called when verification is done auto maticlly
-                                },
-                                verificationFailed: (authException) {
-                                  print(authException.message);
-                                },
-                                codeSent: (String verificationId, [int forceResendingToken]) async {
-                                  showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          scrollable: true,
-                                          title: Text("Give the code?"),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Text('wait for the code to autofill'),
-                                              TextField(
-                                                controller: _codeController,
-                                              ),
-                                            ],
-                                          ),
-                                          actions: <Widget>[
-                                            ElevatedButton(
-                                              child: Text("Confirm"),
-                                              onPressed: () async {
-                                                final code = _codeController.text.trim();
-                                                AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: code);
-                                                var result = await FirebaseAuth.instance.signInWithCredential(credential);
-                                                User user = result.user;
-
-                                                if (user != null) {
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
-                                                } else {
-                                                  print("Error");
-                                                }
-                                              },
-                                            )
-                                          ],
-                                        );
-                                      });
-                                },
-                                codeAutoRetrievalTimeout: (String verificationId) {
-                                  verificationId = verificationId;
-                                  print(verificationId);
-                                  print("Timout");
-                                },
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ))
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //
+  // loginwithphone(BuildContext context) {
+  //   return AlertDialog(
+  //     title: const Text('Login with email'),
+  //     scrollable: true,
+  //     content: Stack(
+  //       children: <Widget>[
+  //         Form(
+  //           key: _formKey,
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               Padding(
+  //                 padding: EdgeInsets.all(8.0),
+  //                 child: TextFormField(
+  //                   decoration: const InputDecoration(
+  //                     icon: Icon(Icons.email),
+  //                     hintText: '+91 ',
+  //                     labelText: 'phone *',
+  //                   ),
+  //                   validator: (value) {
+  //                     if (value == null || value.isEmpty) {
+  //                       return 'Please enter some text';
+  //                     }
+  //                     return null;
+  //                   },
+  //                   onChanged: (value) {
+  //                     phone = value;
+  //                   },
+  //                 ),
+  //               ),
+  //               Padding(
+  //                 padding: EdgeInsets.all(8.0),
+  //                 child: TextFormField(
+  //                   decoration: const InputDecoration(
+  //                     icon: Icon(Icons.password),
+  //                     hintText: '*** ***',
+  //                     labelText: 'OTP *',
+  //                   ),
+  //                   validator: (value) {
+  //                     if (value == null || value.isEmpty) {
+  //                       return 'Please enter some text';
+  //                     }
+  //                     return null;
+  //                   },
+  //                   onChanged: (value) {
+  //                     otp = value;
+  //                   },
+  //                 ),
+  //               ),
+  //               Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: ButtonBar(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       ElevatedButton(
+  //                         child: Text("Cancel"),
+  //                         onPressed: () {
+  //                           Navigator.of(context, rootNavigator: true).pop('Cancel');
+  //                         },
+  //                       ),
+  //                       SizedBox(
+  //                         width: 8,
+  //                       ),
+  //                       ElevatedButton(
+  //                         child: Text("Submit"),
+  //                         onPressed: () async {
+  //                           if (_formKey.currentState.validate()) {
+  //                             _formKey.currentState.save();
+  //                             phone = '+91$phone';
+  //                             FirebaseAuth.instance.verifyPhoneNumber(
+  //                               phoneNumber: phone,
+  //                               timeout: Duration(seconds: 30),
+  //                               verificationCompleted: (AuthCredential credential) async {
+  //                                 var result = await FirebaseAuth.instance.signInWithCredential(credential);
+  //                                 User user = result.user;
+  //                                 if (user != null) {
+  //                                   print("userData: $user");
+  //                                   Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
+  //                                 } else {
+  //                                   print("Error");
+  //                                 }
+  //
+  //                                 //This callback would gets called when verification is done auto maticlly
+  //                               },
+  //                               verificationFailed: (authException) {
+  //                                 print(authException.message);
+  //                               },
+  //                               codeSent: (String verificationId, [int forceResendingToken]) async {
+  //                                 showDialog(
+  //                                     context: context,
+  //                                     barrierDismissible: false,
+  //                                     builder: (context) {
+  //                                       return AlertDialog(
+  //                                         scrollable: true,
+  //                                         title: Text("Give the code?"),
+  //                                         content: Column(
+  //                                           mainAxisSize: MainAxisSize.min,
+  //                                           children: <Widget>[
+  //                                             Text('wait for the code to autofill'),
+  //                                             TextField(
+  //                                               controller: _codeController,
+  //                                             ),
+  //                                           ],
+  //                                         ),
+  //                                         actions: <Widget>[
+  //                                           ElevatedButton(
+  //                                             child: Text("Confirm"),
+  //                                             onPressed: () async {
+  //                                               final code = _codeController.text.trim();
+  //                                               AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: code);
+  //                                               var result = await FirebaseAuth.instance.signInWithCredential(credential);
+  //                                               User user = result.user;
+  //
+  //                                               if (user != null) {
+  //                                                 Navigator.push(context, MaterialPageRoute(builder: (context) => myApp()));
+  //                                               } else {
+  //                                                 print("Error");
+  //                                               }
+  //                                             },
+  //                                           )
+  //                                         ],
+  //                                       );
+  //                                     });
+  //                               },
+  //                               codeAutoRetrievalTimeout: (String verificationId) {
+  //                                 verificationId = verificationId;
+  //                               },
+  //                             );
+  //                           }
+  //                         },
+  //                       ),
+  //                     ],
+  //                   ))
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

@@ -31,12 +31,42 @@ class Database{
     }
   }
 
+  Stream<UserProfileData> get getUserProfileData {
+    if (uid == null) return null;
+    return userCollection.doc(uid).snapshots().map((snap) => UserProfileData.fromFirebase(snap.data()));
+  }
+
+  Future<bool> addNewPost({String title, String description, String imageUrl, String profileName, String posterTime, String postId, int viewCount}) async {
+    try{
+
+      await userCollection.doc(uid).collection('Post').doc(postId).set({
+        'title': title,
+        'description' : description,
+        'imageUrl': imageUrl,
+        'posterTime': posterTime,
+        'profileName': profileName,
+        'viewCount': viewCount,
+      });
+
+      await userCollection.doc(uid).set({
+        'postListID' : FieldValue.arrayUnion([postId])
+      }, SetOptions(merge: true));
+
+      return true;
+    }on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
 
 
   Future<List<UrlData>> get getAccountPostData async {
     try{
       List<UrlData> accountPost = [];
-      var fetchResponse = await userCollection.doc(uid).collection('Sites').doc('url').get();
+      var fetchResponse = await userCollection.doc(uid).collection('Post').doc('url').get();
       if(fetchResponse.data() == null){
         accountPost = [];
       }else{

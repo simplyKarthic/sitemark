@@ -1,39 +1,49 @@
 class UrlData{
 
-  final int count;
-  final String image;
-  final String link;
-  final String name;
+  final String title;
+  final String description;
+  final Uri imageUrl;
+  final int viewCount;
+  final String posterTime;
+  final String profileName;
 
   UrlData({
-      this.count,
-     this.image,
-     this.link,
-     this.name,
+      this.title,
+     this.description,
+     this.imageUrl,
+     this.viewCount,
+    this.posterTime,
+    this.profileName
   });
 
   factory UrlData.fromJson(Map<String, dynamic> data) =>
       UrlData(
-          count: data['count'] ?? 0,
-          image: data['image'] ?? '',
-          link: data['link'] ?? '',
-          name: data['name'] ?? ''
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
+          imageUrl: data['imageUrl'] ?? '',
+          viewCount: data['viewCount'] ?? 0,
+          posterTime: data['posterTime'] ?? '',
+          profileName: data['profileName'] ?? ''
       );
 
   Map<String, dynamic> toJson()=>{
-    'count': count,
-    'image': image,
-    'link': link,
-    'name': name
+    'title': title,
+    'description': description,
+    'imageUrl': imageUrl,
+    'viewCount': viewCount,
+    'posterTime': posterTime,
+    'profileName': profileName
   };
 
 
   factory UrlData.initial(){
     return UrlData(
-      count: 0,
-      image: '',
-      link: 'sitemark.com',
-      name: 'sitemark'
+        title: '',
+        description: '',
+        imageUrl: Uri.parse(''),
+        viewCount: 0,
+        posterTime: '',
+        profileName: ''
     );
   }
 }

@@ -90,7 +90,6 @@ siteGridContainer(BuildContext context, UrlData data) {
   }
   return GestureDetector(
     onTap: () {
-      _launchURL(data.link);
     },
     child: Material(
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -116,13 +115,13 @@ siteGridContainer(BuildContext context, UrlData data) {
           children: <Widget>[
             Image(
               image: NetworkImage(
-                data.image,
+                (data.imageUrl).toString(),
               ),
               height: 50,
               width: 50,
             ),
             Text(
-              data.name,
+              data.title,
               style: TextStyle(
                 fontSize: 17,
               ),
@@ -142,10 +141,6 @@ siteListContainer(BuildContext context, UrlData data) {
   return GestureDetector(
     onTap: () {
       //_launchURL(data.link);
-      print("data");
-      print(data);
-      print(data.link);
-      print(data.image);
     },
     child: Material(
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -168,13 +163,13 @@ siteListContainer(BuildContext context, UrlData data) {
           children: <Widget>[
             Image(
               image: NetworkImage(
-                data.image,
+                (data.imageUrl).toString(),
               ),
               height: 50,
               width: 50,
             ),
             Text(
-              data.name,
+              data.title,
               style: TextStyle(
                 fontSize: 17,
               ),

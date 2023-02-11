@@ -3,20 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sitemark/screens/QuotesData.dart';
-import 'package:sitemark/screens/Register.dart';
 import 'package:sitemark/screens/entryScreen.dart';
-import 'package:sitemark/screens/login.dart';
 import 'package:sitemark/screens/mySites.dart';
-
-import 'database/database.dart';
 import 'models/user.dart';
 
 class NavDrawer extends StatelessWidget {
   UserData user;
-
+  UserProfileData userProfileData;
   @override
   Widget build(BuildContext context) {
-    UserData user = Provider.of<UserData>(context);
+    user = Provider.of<UserData>(context);
+    userProfileData = Provider.of<UserProfileData>(context);
+
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.8,
       child: ListView(
@@ -33,14 +31,14 @@ class NavDrawer extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 52,
-                    backgroundImage: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b'),
+                    backgroundImage: NetworkImage(userProfileData.profilePic),
                   ),
                   Text(
-                    'Bill gates',
+                    userProfileData.name,
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
                   Text(
-                    'bill@microsoft.com',
+                    user.email,
                     style: TextStyle(fontSize: 15, color: Colors.white),
                   ),
                 ],

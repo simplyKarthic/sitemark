@@ -2,8 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sitemark/models/user.dart';
 import 'dart:math';
+import '../models/ProxyData.dart';
 import '../navDrawer.dart';
+import '../database/database.dart';
 
 class QuotesData extends StatefulWidget {
   const QuotesData({Key key}) : super(key: key);
@@ -38,6 +42,8 @@ class _QuotesDataState extends State<QuotesData> {
 
   @override
   Widget build(BuildContext context) {
+    ProxyData proxyData = Provider.of<ProxyData>(context);
+    UserData user = proxyData.userData;
 
     int colorIndex = 0;
     Color _two = Color(0xffA3DEE9);
@@ -46,7 +52,7 @@ class _QuotesDataState extends State<QuotesData> {
     Color _three = Color(0xffFAD764);
     Color _one = Color(0xffFFE9ED);
     List mixColors = [_one, _two, _three, _four, _five];
-
+//todo: post the philosofy with a photo in the post for home
     return Scaffold(
       drawer: NavDrawer(),
       appBar: AppBar(
@@ -62,9 +68,9 @@ class _QuotesDataState extends State<QuotesData> {
                 itemBuilder: (context, index) {
                   List tags = _quotes[index]['tags'];
 
-                  if(colorIndex < 4){
-                    colorIndex +=1;
-                  }else{
+                  if (colorIndex < 4) {
+                    colorIndex += 1;
+                  } else {
                     colorIndex = 0;
                   }
 
@@ -93,12 +99,23 @@ class _QuotesDataState extends State<QuotesData> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            (tags.isNotEmpty) ?
-                            Text("#${tags[0]}", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600)):
-                            Text("#philosophy", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600))
+                            (tags.isNotEmpty)
+                                ? Text("#${tags[0]}", style: const TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600))
+                                : const Text("#philosophy", style: TextStyle(color: Color(0xff71838E), fontWeight: FontWeight.w600))
                           ],
                         ),
                       ),
+                      onTap: () async {
+                        var status = await Database(uid: user.uid).addNewPost(
+                            title: _quotes[index]['author'],
+                            description: _quotes[index]['content'],
+                            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b',
+                            profileName: 'username',
+                            posterTime: DateTime.now().toString(),
+                            postId: _quotes[index]['_id'],
+                            viewCount: 1
+                        );
+                      },
                     ),
                   );
                 },

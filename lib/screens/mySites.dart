@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../database/database.dart';
 import '../models/UrlData.dart';
 import '../models/user.dart';
+import 'addSite.dart';
 
 
 class MySites extends StatefulWidget {
@@ -20,7 +22,25 @@ class _MySitesState extends State<MySites> {
   Widget build(BuildContext context) {
     UserData user = Provider.of<UserData>(context);
     return Scaffold(
-      appBar: AppBar(actions: <Widget>[
+      appBar: AppBar(
+          title: Text("My Post's"),
+          actions: <Widget>[
+
+        IconButton(
+          icon: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => addSite(context),
+              ),
+            );
+          },
+        ),
+
         (gridView == true)
             ? IconButton(
                 icon: Icon(
@@ -46,16 +66,16 @@ class _MySitesState extends State<MySites> {
               ),
       ]),
       body: Center(
-        child: FutureBuilder(
-          future: Database(uid: user.uid).getAccountPostData,
-          builder: (BuildContext context, AsyncSnapshot<List<UrlData>> snapshot) {
-            List<UrlData> postData = snapshot.data;
-            if (postData == null || !snapshot.hasData){
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('User').doc(user.uid).collection('Post').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData){
               return const Center(child: CircularProgressIndicator());
             }
+            List<DocumentSnapshot> documents = snapshot.data.docs;
             if (gridView == true){
               return GridView.builder(
-                itemCount: snapshot.data.length,
+                itemCount: documents.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 4.0,
@@ -64,17 +84,17 @@ class _MySitesState extends State<MySites> {
                   itemBuilder: (context, index){
                     return Container(
                       padding: EdgeInsets.all(15),
-                      child: siteGridContainer(context, postData[index]),
+                      child: siteGridContainer(context, documents[index]),
                     );
                   }
               );
             }
             return ListView.builder(
-                itemCount: snapshot.data.length,
+                itemCount: documents.length,
                 itemBuilder: (context, index) {
                   return Container(
                     padding: EdgeInsets.all(15),
-                    child: siteListContainer(context, postData[index])
+                    child: siteListContainer(context, documents[index])
                   );
                });
           },
@@ -84,12 +104,10 @@ class _MySitesState extends State<MySites> {
   }
 }
 
-siteGridContainer(BuildContext context, UrlData data) {
-  if (data == null) {
-    return const SizedBox();
-  }
+siteGridContainer(BuildContext context, documents) {
   return GestureDetector(
     onTap: () {
+      _showFullScreenImage(context, documents);
     },
     child: Material(
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -115,13 +133,13 @@ siteGridContainer(BuildContext context, UrlData data) {
           children: <Widget>[
             Image(
               image: NetworkImage(
-                (data.imageUrl).toString(),
+                documents["imageUrl"],
               ),
               height: 50,
               width: 50,
             ),
             Text(
-              data.title,
+              documents["title"],
               style: TextStyle(
                 fontSize: 17,
               ),
@@ -134,13 +152,10 @@ siteGridContainer(BuildContext context, UrlData data) {
   );
 }
 
-siteListContainer(BuildContext context, UrlData data) {
-  if (data == null) {
-    return const SizedBox();
-  }
+siteListContainer(BuildContext context, documents) {
   return GestureDetector(
     onTap: () {
-      //_launchURL(data.link);
+      _showFullScreenImage(context, documents);
     },
     child: Material(
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -163,13 +178,13 @@ siteListContainer(BuildContext context, UrlData data) {
           children: <Widget>[
             Image(
               image: NetworkImage(
-                (data.imageUrl).toString(),
+                documents["imageUrl"],
               ),
               height: 50,
               width: 50,
             ),
             Text(
-              data.title,
+              documents["title"],
               style: TextStyle(
                 fontSize: 17,
               ),
@@ -182,10 +197,98 @@ siteListContainer(BuildContext context, UrlData data) {
   );
 }
 
-_launchURL(url) async {
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
-  }
+_showFullScreenImage(BuildContext context, documents) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: (documents["viewCount"] > 10)
+                ? LinearGradient(
+              colors: [
+                Color(0xFFFAA86E),
+                Color(0xFFFD9495),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            )
+                : LinearGradient(
+              colors: [Color.fromRGBO(133, 206, 225, 1.0), Color.fromRGBO(72, 159, 180, 1.0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          height: MediaQuery.of(context).size.height * 0.77,
+          width: MediaQuery.of(context).size.width * 0.90,
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InteractiveViewer(
+                  panEnabled: false, // Set it to false
+                  constrained: true,
+                  minScale: 1,
+                  maxScale: 2,
+                  child: Hero(
+                    tag: documents["imageUrl"],
+                    child: Image.network(
+                      documents["imageUrl"],
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                ),
+
+                Container(padding: EdgeInsets.all(8), height: 130, color: Colors.grey[350], child: SingleChildScrollView(child: Text(documents["description"]))),
+
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Delete'), // <-- Text
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.delete,
+                            size: 20.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Repost'), // <-- Text
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.loop,
+                            size: 20.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
+

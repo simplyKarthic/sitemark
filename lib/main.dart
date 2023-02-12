@@ -40,9 +40,7 @@ class _myAppState extends State<myApp> {
                 color: Colors.white,
               ),
               onPressed: () {
-                showDialog<String>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(title: const Text('Add your website'), scrollable: true, content: addSite(context)));
+
               },
             ),
         ],

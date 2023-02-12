@@ -29,9 +29,25 @@ class NavDrawer extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  (userProfileData.profilePic != null)?
                   CircleAvatar(
                     radius: 52,
-                    backgroundImage: NetworkImage(userProfileData.profilePic),
+                    backgroundImage: NetworkImage( userProfileData.profilePic),
+                  ):
+                  Container(
+                    width: 120.0,
+                    height: 120.0,
+                    child: Center(
+                      child: Icon(
+                        Icons.person,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: new BorderRadius.all(new Radius.circular(60.0)),
+                    ),
                   ),
                   Text(
                     userProfileData.name,

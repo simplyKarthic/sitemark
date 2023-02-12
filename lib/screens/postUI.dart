@@ -25,17 +25,7 @@ class PostUI extends StatefulWidget {
 class _PostUIState extends State<PostUI> {
   String firstHalf;
   String secondHalf;
-
-  @override
-  void initState() {
-    if (widget.description.length > 220) {
-      firstHalf = widget.description.substring(0, 220);
-      secondHalf = widget.description.substring(220, widget.description.length);
-    } else {
-      firstHalf = widget.description;
-      secondHalf = "";
-    }
-  }
+  bool _showFullText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +71,26 @@ class _PostUIState extends State<PostUI> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(
+                    Container(
+                      height: 110,
                       width: MediaQuery.of(context).size.width * 0.57,
-                      child: secondHalf.isEmpty ? Text(firstHalf) : Text(firstHalf + '....'),
+                      child: RawScrollbar(
+                          thumbColor: (widget.viewCount > 10) ? Color.fromRGBO(72, 159, 180, 1.0).withOpacity(0.5) : Color(0xFFFD9495).withOpacity(0.5),
+                          thumbVisibility: false,
+                        thickness: 2,
+                          radius: const Radius.circular(10),
+                          child: SingleChildScrollView(child: Padding(
+                            padding: const EdgeInsets.only(right: 1.0),
+                            child: GestureDetector(
+                                onTap: (){
+                                  setState(() {
+                                    _showFullText = true;
+                                  });
+                                },
+                                child: Text(_showFullText ? widget.description: "${widget.description.substring(0, 210)}.....")),
+                          )
+                          )
+                      ),
                     ),
                     Container(
                       height: 110.0,

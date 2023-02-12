@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sitemark/models/user.dart';
 
@@ -16,6 +19,7 @@ class Database{
       await userCollection.doc(uid).set({
         'name': name,
         'uid' : uid,
+        'postListID': [],
         'profilepic': profilePic,
         'createdDate': Timestamp.now(),
         'authby': authby
@@ -45,7 +49,7 @@ class Database{
         'imageUrl': imageUrl,
         'posterTime': posterTime,
         'profileName': profileName,
-        'viewCount': viewCount,
+        'viewCount': 0,
       });
 
       await userCollection.doc(uid).set({
@@ -66,12 +70,8 @@ class Database{
   Future<List<UrlData>> get getAccountPostData async {
     try{
       List<UrlData> accountPost = [];
-      var fetchResponse = await userCollection.doc(uid).collection('Post').doc('url').get();
-      if(fetchResponse.data() == null){
-        accountPost = [];
-      }else{
-        accountPost = fetchResponse.data().entries.map((e) => UrlData.fromJson(e.value)).toList();
-      }
+      var fetchResponse = await FirebaseFirestore.instance.collection('User').doc(uid).collection('Post').snapshots();
+
       return accountPost;
     }catch(err){
       print("getAccountPostData error: $err");
@@ -79,6 +79,5 @@ class Database{
     }
 
   }
-
 
 }

@@ -45,6 +45,10 @@ dependencies:
   shared_preferences: ^2.0.15
   provider: ^6.0.5
   http: ^0.13.5
+  image_picker: ^0.8.6+1
+  firebase_storage: ^11.0.11
+  fluttertoast: 8.0.9
+  image_cropper: ^3.0.1
 
 dev_dependencies:
   flutter_test:

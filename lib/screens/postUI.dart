@@ -1,12 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../database/database.dart';
+import '../functions/randomGen.dart';
+import '../models/user.dart';
 
 class PostUI extends StatefulWidget {
   final String title;
   final String description;
   final String imageUrl;
   final int viewCount;
-  final String posterTime;
+  final String postedTime;
   final String profileName;
+  final String postId;
+  final String postedUserId;
 
   PostUI({
     Key key,
@@ -14,8 +22,10 @@ class PostUI extends StatefulWidget {
     @required this.description,
     @required this.imageUrl,
     @required this.viewCount,
-    @required this.posterTime,
+    @required this.postedTime,
     @required this.profileName,
+    @required this.postId,
+    @required this.postedUserId,
   }) : super(key: key);
 
   @override
@@ -29,6 +39,10 @@ class _PostUIState extends State<PostUI> {
 
   @override
   Widget build(BuildContext context) {
+    int desLen = (widget.description.length < 210) ? widget.description.length : 210;
+    UserData user = Provider.of<UserData>(context);
+    UserProfileData userProfileData = Provider.of<UserProfileData>(context);
+
     return Container(
         margin: EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
@@ -77,20 +91,21 @@ class _PostUIState extends State<PostUI> {
                       child: RawScrollbar(
                           thumbColor: (widget.viewCount > 10) ? Color.fromRGBO(72, 159, 180, 1.0).withOpacity(0.5) : Color(0xFFFD9495).withOpacity(0.5),
                           thumbVisibility: false,
-                        thickness: 2,
+                          thickness: 2,
                           radius: const Radius.circular(10),
-                          child: SingleChildScrollView(child: Padding(
+                          child: SingleChildScrollView(
+                              child: Padding(
                             padding: const EdgeInsets.only(right: 1.0),
                             child: GestureDetector(
-                                onTap: (){
+                                onTap: () {
                                   setState(() {
                                     _showFullText = true;
                                   });
                                 },
-                                child: Text(_showFullText ? widget.description: "${widget.description.substring(0, 210)}.....")),
-                          )
-                          )
-                      ),
+                                child: Text((_showFullText || widget.description.length < 210)
+                                    ? widget.description
+                                    : "${widget.description.substring(0, desLen)}.....")),
+                          ))),
                     ),
                     Container(
                       height: 110.0,
@@ -107,10 +122,12 @@ class _PostUIState extends State<PostUI> {
                 ),
               ),
             ),
-            const SizedBox(height: 4,),
+            const SizedBox(
+              height: 4,
+            ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
               Text(
-                "${widget.posterTime} • ${widget.profileName}",
+                "${widget.postedTime} • ${widget.profileName}",
                 style: Theme.of(context).textTheme.caption,
               ),
               Wrap(
@@ -131,7 +148,17 @@ class _PostUIState extends State<PostUI> {
                     width: 10,
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Database(uid: user.uid).startChat(
+                          chatting: true,
+                          chatId: getRandomString(10),
+                          from_uid: user.uid,
+                          to_uid: widget.postedUserId,
+                          postId: widget.postId,
+                          postTitle: widget.title,
+                          fromName: userProfileData.name,
+                          toName: widget.profileName);
+                    },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -150,8 +177,7 @@ class _PostUIState extends State<PostUI> {
               ),
             ])
           ],
-        )
-    );
+        ));
   }
 
   _showFullScreenImage(BuildContext context) {
@@ -197,9 +223,7 @@ class _PostUIState extends State<PostUI> {
                       ),
                     ),
                   ),
-
                   Container(padding: EdgeInsets.all(8), height: 130, color: Colors.grey[350], child: SingleChildScrollView(child: Text(widget.description))),
-
                   SizedBox(
                     height: 10,
                   ),

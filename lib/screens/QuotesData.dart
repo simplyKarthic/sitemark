@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class _QuotesDataState extends State<QuotesData> {
   Widget build(BuildContext context) {
     ProxyData proxyData = Provider.of<ProxyData>(context);
     UserData user = proxyData.userData;
-
+    UserProfileData userProfileData = proxyData.userProfileData;
     int colorIndex = 0;
     Color _two = Color(0xffA3DEE9);
     Color _four = Color(0xffDCECFF);
@@ -110,8 +111,8 @@ class _QuotesDataState extends State<QuotesData> {
                             title: _quotes[index]['author'],
                             description: _quotes[index]['content'],
                             imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b',
-                            profileName: 'username',
-                            posterTime: DateTime.now().toString(),
+                            profileName: userProfileData.name,
+                            postedTime: Timestamp.now(),
                             postId: _quotes[index]['_id'],
                             viewCount: 1
                         );

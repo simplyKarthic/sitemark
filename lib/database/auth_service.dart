@@ -52,12 +52,60 @@ class AuthService {
     }
   }
 
-  registerWithEmailAndPassword(String email, String password) async {
-    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    User user = credential.user;
-    return user;
+  loginWithGoogle() async {
+    try {
+      User user = await authenticateWithGoogle();
+      if (user == null) return null;
+      if (user != null) {
+        return UserData(
+            uid: user.uid,
+            email: user.email.toString()
+        );
+      }
+    } catch (error) {
+      return error;
+    }
   }
+
+  registerWithEmailAndPassword(String name, String email, String password) async {
+    try{
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User user = credential.user;
+      if (user == null) return null;
+      if (user != null) {
+        await Database(uid: user.uid).addUser(name, email, '', 'password');
+      }
+      return UserData(uid: user.uid, email: user.email.toString());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+      return null;
+    }
+  }
+
+  loginWithEmailAndPassword(String email, String password) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password
+      );
+      User user = credential.user;
+      if (user == null) return null;
+      return UserData(uid: user.uid, email: user.email.toString());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+      return null;
+    }
+  }
+
 }

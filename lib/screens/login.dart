@@ -40,7 +40,7 @@ class _loginState extends State<login> {
             ElevatedButton(
               child: Text('Google'),
               onPressed: () async {
-                var result = await AuthService().RegisterWithGoogle();
+                  var result = await AuthService().loginWithGoogle();
 
                 Navigator.pushReplacement(
                   context,
@@ -127,7 +127,7 @@ class _loginState extends State<login> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
                               print("email: $email, password $password");
-                              var result = await AuthService().registerWithEmailAndPassword(email, password);
+                              var result = await AuthService().loginWithEmailAndPassword(email, password);
                               print("Result :   $result");
                               Navigator.of(context, rootNavigator: true).pop('Submit');
                             }

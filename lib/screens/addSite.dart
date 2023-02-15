@@ -60,7 +60,7 @@ class _addSiteState extends State<addSite> {
             title: _title,
             description: _description,
             imageUrl: profileFileUrl,
-            posterTime: Timestamp.now().toString(),
+            postedTime: Timestamp.now(),
             postId: getRandomString(10),
             profileName: userProfileData.name
           );

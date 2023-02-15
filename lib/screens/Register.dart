@@ -17,9 +17,8 @@ class _RegisterState extends State<Register> {
   final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String email = "";
+  String name = "";
   String password = "";
-  String phone = "";
-  String otp = "";
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +55,7 @@ class _RegisterState extends State<Register> {
 
   Registerwithemail(BuildContext context) {
     return AlertDialog(
-      title: const Text('Login with email'),
+      title: const Text('Register with email'),
       scrollable: true,
       content: Stack(
         children: <Widget>[
@@ -66,7 +65,26 @@ class _RegisterState extends State<Register> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(2.0),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.email),
+                      hintText: 'Username',
+                      labelText: 'Name *',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      name = value;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(2.0),
                   child: TextFormField(
                     decoration: const InputDecoration(
                       icon: Icon(Icons.email),
@@ -85,7 +103,7 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(2.0),
                   child: TextFormField(
                     decoration: const InputDecoration(
                       icon: Icon(Icons.password),
@@ -106,7 +124,7 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
                 Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(5.0),
                     child: ButtonBar(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -125,7 +143,7 @@ class _RegisterState extends State<Register> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
                               print("email: $email, password $password");
-                              var result = await AuthService().registerWithEmailAndPassword(email, password);
+                              var result = await AuthService().registerWithEmailAndPassword(name, email, password);
                               print("Result :   $result");
                               Navigator.of(context, rootNavigator: true).pop('Submit');
                               Navigator.pop(context);

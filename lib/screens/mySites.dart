@@ -64,7 +64,8 @@ class _MySitesState extends State<MySites> {
                   });
                 },
               ),
-      ]),
+      ]
+      ),
       body: Center(
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('User').doc(user.uid).collection('Post').snapshots(),

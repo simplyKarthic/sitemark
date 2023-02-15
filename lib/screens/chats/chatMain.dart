@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user.dart';
 import 'chatbox.dart';
+import 'conversationTile.dart';
 
 class ChatMain extends StatefulWidget {
   const ChatMain({Key key}) : super(key: key);
@@ -10,7 +11,7 @@ class ChatMain extends StatefulWidget {
   @override
   State<ChatMain> createState() => _ChatMainState();
 }
-
+//todo: design UI for chat members
 class _ChatMainState extends State<ChatMain> {
   @override
   Widget build(BuildContext context) {
@@ -30,24 +31,45 @@ class _ChatMainState extends State<ChatMain> {
             List<DocumentSnapshot> documents = snapshot.data.docs;
 
             return ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
-                  return Container(
-                      padding: EdgeInsets.all(15),
-                      child: Container(
-                        child: ElevatedButton(
-                            child: Text(myPost ? documents[index]['fromName'] : documents[index]['toName']),
-                            onPressed: () async {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChatBox(chatID: documents[index]['chatID'], user: user),
-                                ),
-                              );
-                            }),
-                      ));
-                });
+              itemCount: documents.length,
+              shrinkWrap: true,
+              padding: EdgeInsets.only(top: 16),
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index){
+                bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
+                return ConversationTile(
+                  name: myPost ? documents[index]['fromName'] : documents[index]['toName'],
+                  messageText: documents[index]['postTitle'],
+                  imageUrl: '',
+                  time: '19min ago',
+                  isMessageRead: (index == 0 || index == 3) ? true : false,
+                  chatID: documents[index]['chatID'],
+                  user: user,
+
+                );
+              },
+            );
+
+
+            // return ListView.builder(
+            //     itemCount: documents.length,
+            //     itemBuilder: (context, index) {
+            //       bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
+            //       return Container(
+            //           padding: EdgeInsets.all(15),
+            //           child: Container(
+            //             child: ElevatedButton(
+            //                 child: Text(myPost ? documents[index]['fromName'] : documents[index]['toName']),
+            //                 onPressed: () async {
+            //                   Navigator.pushReplacement(
+            //                     context,
+            //                     MaterialPageRoute(
+            //                       builder: (context) => ChatBox(chatID: documents[index]['chatID'], user: user),
+            //                     ),
+            //                   );
+            //                 }),
+            //           ));
+            //     });
           },
         ));
   }

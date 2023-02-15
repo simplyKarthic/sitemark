@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sitemark/models/user.dart';
 
+import '../functions/randomGen.dart';
 import '../models/UrlData.dart';
 
 class Database {
@@ -14,6 +15,7 @@ class Database {
 
   final CollectionReference userCollection = FirebaseFirestore.instance.collection('User');
   final CollectionReference feedsCollection = FirebaseFirestore.instance.collection('generalFeeds');
+  final CollectionReference chatsCollection = FirebaseFirestore.instance.collection('chats');
 
   Future<bool> addUser(String name, String email, String profilePic, String authby) async {
     try {
@@ -105,6 +107,23 @@ class Database {
         }
       });
 
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  Future<bool> sendMessage({String chatId, String senderID, String text}) async {
+    try {
+      await chatsCollection
+          .doc(chatId)
+          .collection('messages')
+          .doc(getRandomString(15))
+          .set({'sender_id': senderID, 'text': text, 'timeStamp': Timestamp.now()});
       return true;
     } on FirebaseException catch (err) {
       print(err);

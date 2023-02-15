@@ -53,7 +53,7 @@ class _QuotesDataState extends State<QuotesData> {
     Color _three = Color(0xffFAD764);
     Color _one = Color(0xffFFE9ED);
     List mixColors = [_one, _two, _three, _four, _five];
-//todo: post the philosofy with a photo in the post for home
+
     return Scaffold(
       drawer: NavDrawer(),
       appBar: AppBar(

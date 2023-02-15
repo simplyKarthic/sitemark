@@ -20,7 +20,6 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           centerTitle: true,
           title: const Text("Home"),
-          backgroundColor: Colors.blue,
         ),
         body: Container(
             child: StreamBuilder<QuerySnapshot>(

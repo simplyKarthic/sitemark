@@ -48,6 +48,24 @@ class MyApp extends StatelessWidget {
                     ],
                     child: MaterialApp(
                       title: "my app",
+                      theme: ThemeData(
+                        colorScheme: ColorScheme(
+                          brightness: Brightness.light,
+                          primary: Color.fromRGBO(133, 206, 225, 1.0),
+                          onPrimary: Colors.black54,
+                          // Colors that are not relevant to AppBar in LIGHT mode:
+                          primaryVariant: Colors.grey,
+                          secondary: Colors.grey,
+                          secondaryVariant: Colors.grey,
+                          onSecondary: Colors.grey,
+                          background: Colors.grey,
+                          onBackground: Colors.grey,
+                          surface: Colors.grey,
+                          onSurface: Colors.grey,
+                          error: Colors.grey,
+                          onError: Colors.grey,
+                        ),
+                      ),
                       debugShowCheckedModeBanner: false,
                       initialRoute: '/entry',
                       onGenerateRoute: (settings) => RouteGenerator.generateRoute(settings),

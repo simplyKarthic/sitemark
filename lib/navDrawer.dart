@@ -26,7 +26,7 @@ class NavDrawer extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.40,
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color.fromRGBO(133, 206, 225, 1.0),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

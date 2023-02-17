@@ -1,10 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sitemark/models/user.dart';
-
-import '../main.dart';
-import '../screens/login.dart';
 import 'database.dart';
 
 class AuthService {
@@ -34,38 +31,29 @@ class AuthService {
     }
   }
 
-  Future<Object> RegisterWithGoogle() async {
+  Future<Object> accessWithGoogle() async {
     try {
       User user = await authenticateWithGoogle();
       if (user == null) return null;
       if (user != null) {
-        bool profileres = await Database(uid: user.uid)
-            .addUser(user.displayName.toString(), user.email.toString(), user.photoURL.toString(), 'Google');
-
+        final DocumentReference userRef = FirebaseFirestore.instance.collection('User').doc(user.uid);
+        final DocumentSnapshot userSnapshot = await userRef.get();
+        if (!userSnapshot.exists) {
+          await Database(uid: user.uid)
+              .addUser(user.displayName.toString(), user.email.toString(), user.photoURL.toString(), 'Google');
+        }
         return UserData(
             uid: user.uid,
             email: user.email.toString()
         );
+      }else{
+        return null;
       }
     } catch (error) {
       return error;
     }
   }
 
-  loginWithGoogle() async {
-    try {
-      User user = await authenticateWithGoogle();
-      if (user == null) return null;
-      if (user != null) {
-        return UserData(
-            uid: user.uid,
-            email: user.email.toString()
-        );
-      }
-    } catch (error) {
-      return error;
-    }
-  }
 
   registerWithEmailAndPassword(String name, String email, String password) async {
     try{

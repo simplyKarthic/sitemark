@@ -50,6 +50,9 @@ dependencies:
   fluttertoast: 8.0.9
   image_cropper: ^3.0.1
   google_fonts: ^4.0.3
+  firebase_database: ^10.0.13
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

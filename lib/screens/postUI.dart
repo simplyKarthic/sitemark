@@ -1,31 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:sitemark/screens/viewPost.dart';
 
 import '../database/database.dart';
 import '../functions/randomGen.dart';
+import '../models/ProxyData.dart';
 import '../models/user.dart';
+import 'constantData.dart';
 
 class PostUI extends StatefulWidget {
   final String title;
   final String description;
   final String imageUrl;
-  final int viewCount;
+  final int commentCount;
   final String postedTime;
   final String profileName;
   final String postId;
   final String postedUserId;
+  final String routedFrom;
+  final String currentUserUid;
 
   PostUI({
     Key key,
     @required this.title,
     @required this.description,
     @required this.imageUrl,
-    @required this.viewCount,
+    @required this.commentCount,
     @required this.postedTime,
     @required this.profileName,
     @required this.postId,
     @required this.postedUserId,
+    @required this.routedFrom,
+    @required this.currentUserUid
   }) : super(key: key);
 
   @override
@@ -36,45 +44,46 @@ class _PostUIState extends State<PostUI> {
   String firstHalf;
   String secondHalf;
   bool _showFullText = false;
+  int onlineUsers = 0;
+
 
   @override
   Widget build(BuildContext context) {
     int desLen = (widget.description.length < 210) ? widget.description.length : 210;
-    UserData user = Provider.of<UserData>(context);
-    UserProfileData userProfileData = Provider.of<UserProfileData>(context);
-
     return Container(
         margin: EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
-          gradient: (widget.viewCount > 10)
-              ? LinearGradient(
-                  colors: [Color(0xFFFAA86E), Color(0xFFFD9495)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              : LinearGradient(
-                  colors: [Color.fromRGBO(133, 206, 225, 1.0), Color.fromRGBO(72, 159, 180, 1.0)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
+          border: Border.all(color: lightBlue),
+          color: secondaryColor,
           borderRadius: BorderRadius.circular(10.0),
         ),
-        height: MediaQuery.of(context).size.height * 0.37,
         padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(
                 widget.title,
-                style: Theme.of(context).textTheme.headline6,
+                style: GoogleFonts.openSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ]),
             SizedBox(
               height: 8,
             ),
             GestureDetector(
-              onTap: () => _showFullScreenImage(context),
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ViewPost(
+                            title: widget.title,
+                            description: widget.description,
+                            imageUrl: widget.imageUrl,
+                            userName: widget.profileName,
+                            time: widget.postedTime,
+                            views: widget.commentCount,
+                            postId: widget.postId,
+                        posterUserUid: widget.postedUserId,
+                          ))),
               child: Container(
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -83,41 +92,38 @@ class _PostUIState extends State<PostUI> {
                       topLeft: Radius.circular(10), topRight: Radius.circular(10), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    //_textExpand(context,isExpanded, widget.description ),
                     Container(
-                      height: 110,
-                      width: MediaQuery.of(context).size.width * 0.57,
+                      width: (widget.imageUrl == '') ? MediaQuery.of(context).size.width * 0.85 : MediaQuery.of(context).size.width * 0.57,
                       child: RawScrollbar(
-                          thumbColor: (widget.viewCount > 10) ? Color.fromRGBO(72, 159, 180, 1.0).withOpacity(0.5) : Color(0xFFFD9495).withOpacity(0.5),
+                          thumbColor: const Color.fromRGBO(72, 159, 180, 1.0).withOpacity(0.5),
                           thumbVisibility: false,
                           thickness: 2,
                           radius: const Radius.circular(10),
                           child: SingleChildScrollView(
-                              child: Padding(
-                            padding: const EdgeInsets.only(right: 1.0),
-                            child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _showFullText = true;
-                                  });
-                                },
-                                child: Text((_showFullText || widget.description.length < 210)
-                                    ? widget.description
-                                    : "${widget.description.substring(0, desLen)}.....")),
+                              child: Text(
+                            widget.description,
+                            style: GoogleFonts.openSans(
+                              color: Color(0xffDCECFF),
+                              fontSize: 14,
+                            ),
                           ))),
                     ),
-                    Container(
-                      height: 110.0,
-                      width: 100.0,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.imageUrl),
-                          fit: BoxFit.cover,
+                    if (widget.imageUrl != '')
+                      Container(
+                        height: 110.0,
+                        width: 100.0,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(widget.imageUrl),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -128,35 +134,52 @@ class _PostUIState extends State<PostUI> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
               Text(
                 "${widget.postedTime} • ${widget.profileName}",
-                style: Theme.of(context).textTheme.caption,
+                style: GoogleFonts.openSans(color: lightBlue, fontSize: 12, fontWeight: FontWeight.w600),
               ),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Text(
-                    "${widget.viewCount}",
-                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    width: 2,
-                  ),
-                  Icon(
-                    Icons.loop,
-                    color: Colors.black54,
+                  (widget.routedFrom == 'viewPost')?
+                  GestureDetector(
+                    onTap: (){
+                      //todo: add report feature
+                    },
+                    child: Icon(
+                      Icons.report,
+                      color: lightRed,
+                      size: 20,
+                    ),
+                  ):
+                  Wrap(
+                    children: [
+                      Text(
+                        "${widget.commentCount}",
+                        style: TextStyle(color: lightBlue, fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Icon(
+                        Icons.mode_comment_outlined,
+                        color: lightBlue,
+                        size: 20,
+                      ),
+                    ],
                   ),
                   SizedBox(
                     width: 10,
                   ),
+                  (widget.currentUserUid != widget.postedUserId)?
                   ElevatedButton(
                     onPressed: () async {
-                      await Database(uid: user.uid).startChat(
+                      await Database(uid: widget.currentUserUid).startChat(
                           chatting: true,
                           chatId: getRandomString(10),
-                          from_uid: user.uid,
+                          from_uid: widget.currentUserUid,
                           to_uid: widget.postedUserId,
                           postId: widget.postId,
                           postTitle: widget.title,
-                          fromName: userProfileData.name,
+                          fromName: 'userProfileData.name',
                           toName: widget.profileName);
                     },
                     child: Row(
@@ -172,104 +195,32 @@ class _PostUIState extends State<PostUI> {
                         ),
                       ],
                     ),
+                  ):
+                  ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance.collection('generalFeeds').doc(widget.postId).delete();
+                      if(widget.routedFrom == "viewPost"){
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Delete'),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Icon(
+                          Icons.delete,
+                          size: 20.0,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ])
           ],
         ));
-  }
-
-  _showFullScreenImage(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              gradient: (widget.viewCount > 10)
-                  ? LinearGradient(
-                      colors: [
-                        Color(0xFFFAA86E),
-                        Color(0xFFFD9495),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    )
-                  : LinearGradient(
-                      colors: [Color.fromRGBO(133, 206, 225, 1.0), Color.fromRGBO(72, 159, 180, 1.0)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-            ),
-            height: MediaQuery.of(context).size.height * 0.75,
-            width: MediaQuery.of(context).size.width * 0.90,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InteractiveViewer(
-                    panEnabled: false, // Set it to false
-                    constrained: true,
-                    minScale: 1,
-                    maxScale: 2,
-                    child: Hero(
-                      tag: widget.imageUrl,
-                      child: Image.network(
-                        widget.imageUrl,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                  ),
-                  Container(padding: EdgeInsets.all(8), height: 130, color: Colors.grey[350], child: SingleChildScrollView(child: Text(widget.description))),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Report'), // <-- Text
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.report_gmailerrorred,
-                              size: 20.0,
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('chat'), // <-- Text
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.send,
-                              size: 20.0,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 }

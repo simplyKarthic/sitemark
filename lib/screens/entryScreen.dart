@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import '../database/auth_service.dart';
 import 'Home.dart';
+import 'constantData.dart';
 
 class entryScreen extends StatefulWidget {
   const entryScreen({Key key}) : super(key: key);
@@ -18,11 +18,9 @@ class entryScreen extends StatefulWidget {
 
 class _entryScreenState extends State<entryScreen> {
 
-  final Color primaryColor = Color(0xff18203d);
-  final Color secondaryColor = Color(0xff232c51);
+
   bool _passwordVisible = false;
   bool _obsecureTextState = true;
-  bool textWarning = false;
   bool errorMessageTime = true;
 
   String errorData = '';
@@ -122,16 +120,17 @@ class _entryScreenState extends State<entryScreen> {
                         } else {
                           setState(() => errorData = 'Please enter Something!');
                         }
-                        Future.delayed(Duration(seconds: 4), () {
-                          if (mounted)
+                        Future.delayed(const Duration(seconds: 4), () {
+                          if (mounted) {
                             setState(() {
                               errorMessageTime = false;
                             });
+                          }
                         });
                       },
                       color: logoGreen,
-                      child: Text('Register', style: TextStyle(color: Colors.white, fontSize: 16)),
                       textColor: Colors.white,
+                      child: const Text('Register', style: TextStyle(color: Colors.white, fontSize: 16)),
                     ),
                     SizedBox(width: 10),
                     MaterialButton(
@@ -248,7 +247,7 @@ class _entryScreenState extends State<entryScreen> {
   _buildTextField(TextEditingController controller, IconData icon, String labelText) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: secondaryColor, border: Border.all(color: (textWarning) ? Colors.redAccent : Colors.blue)),
+      decoration: BoxDecoration(color: secondaryColor, border: Border.all(color: Colors.blue)),
       child: TextField(
         obscureText: (labelText == 'Password') ? _obsecureTextState : false,
         controller: controller,

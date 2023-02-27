@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sitemark/models/user.dart';
 
 import '../functions/randomGen.dart';
-import '../models/UrlData.dart';
 
 class Database {
   final String uid;
@@ -21,7 +19,7 @@ class Database {
     try {
       await userCollection
           .doc(uid)
-          .set({'name': name, 'uid': uid, 'postListID': [], 'profilepic': profilePic, 'createdDate': Timestamp.now(), 'authby': authby});
+          .set({'name': name, 'uid': uid, 'postListID': [], 'profilepic': profilePic, 'lastSeen': Timestamp.now(), 'authby': authby});
 
       return true;
     } on FirebaseException catch (err) {
@@ -38,7 +36,7 @@ class Database {
     return userCollection.doc(uid).snapshots().map((snap) => UserProfileData.fromFirebase(snap.data()));
   }
 
-  Future<bool> addNewPost({String title, String description, String imageUrl, String profileName, Timestamp postedTime, String postId, int viewCount}) async {
+  Future<bool> addNewPost({String title, String description, String imageUrl, String profileName, Timestamp postedTime, String postId, int commentCount}) async {
     try {
       var addPostResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.set(userCollection.doc(uid).collection('Post').doc(postId), {
@@ -48,7 +46,7 @@ class Database {
           'postedTime': postedTime,
           'profileName': profileName,
           'uid': uid,
-          'postCount': 0,
+          'commentCount': 0,
           'chatting': false,
           'postId': postId
         });
@@ -60,7 +58,7 @@ class Database {
           'postedTime': postedTime,
           'profileName': profileName,
           'uid': uid,
-          'postCount': 0,
+          'commentCount': 0,
           'chatting': false,
           'postId': postId
         });
@@ -97,14 +95,6 @@ class Database {
           'toName': toName,
         });
 
-        DocumentSnapshot snapshot = await feedsCollection.doc(postId).get();
-
-        if (snapshot.exists) {
-          await transaction.delete(snapshot.reference);
-          print("Document Deleted");
-        } else {
-          print("Document does not exist");
-        }
       });
 
       return true;
@@ -133,4 +123,70 @@ class Database {
       return false;
     }
   }
+
+  onlineStatus(bool status) async{
+    int userNum = status ? 1 : -1;
+    await FirebaseDatabase.instance.ref().child('userStatus').update({'online': ServerValue.increment(userNum)});
+  }
+
+  Future<bool> commentFunction({String commentData, String userName, String postID}) async {
+    try {
+        String commentId = getRandomString(15);
+        await feedsCollection
+            .doc(postID)
+            .collection('Comments')
+            .doc(commentId)
+            .set({
+          'cmtUserId': uid,
+          'commentData': commentData,
+          'likedUsers': [],
+          'userName': userName,
+          'commentId': commentId,
+          'commentTime': Timestamp.now()
+        });
+
+        await feedsCollection
+            .doc(postID).update({
+          'commentCount': FieldValue.increment(1)
+        });
+
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  Future<bool> likeFunction({String postID, String commentId, bool disLike}) async {
+    try {
+      if(disLike){
+        await feedsCollection
+            .doc(postID)
+            .collection('Comments')
+            .doc(commentId)
+            .update({
+          'likedUsers': FieldValue.arrayRemove([uid]),
+        });
+      }else{
+        await feedsCollection
+            .doc(postID)
+            .collection('Comments')
+            .doc(commentId)
+            .update({
+          'likedUsers': FieldValue.arrayUnion([uid]),
+        });
+      }
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
 }

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sitemark/screens/QuotesData.dart';
 import 'package:sitemark/screens/chats/chatMain.dart';
+import 'package:sitemark/screens/constantData.dart';
 import 'package:sitemark/screens/entryScreen.dart';
 import 'package:sitemark/screens/mySites.dart';
+import 'database/database.dart';
 import 'models/user.dart';
 
 class NavDrawer extends StatelessWidget {
@@ -15,9 +17,11 @@ class NavDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     user = Provider.of<UserData>(context);
     userProfileData = Provider.of<UserProfileData>(context);
+
     if(userProfileData != null){
       String profilePic = (userProfileData.profilePic == null) ? '' : userProfileData.profilePic;
       return Drawer(
+        backgroundColor: secondaryColor,
         width: MediaQuery.of(context).size.width * 0.8,
         child: ListView(
           padding: EdgeInsets.zero,
@@ -26,7 +30,7 @@ class NavDrawer extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.40,
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(133, 206, 225, 1.0),
+                  color: lightBlue,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -66,6 +70,9 @@ class NavDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
               child: ListTile(
+                selectedTileColor: color3,
+                iconColor: lightBlue,
+                textColor: Colors.white,
                 leading: Icon(Icons.home),
                 title: Text('Home'),
                 onTap: () => {Navigator.of(context).pushReplacementNamed('/home')},
@@ -74,6 +81,9 @@ class NavDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
               child: ListTile(
+                selectedTileColor: color3,
+                iconColor: lightBlue,
+                textColor: Colors.white,
                 leading: Icon(Icons.verified_user),
                 title: Text('Chat room'),
                 onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => ChatMain()))},
@@ -82,6 +92,9 @@ class NavDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
               child: ListTile(
+                selectedTileColor: color3,
+                iconColor: lightBlue,
+                textColor: Colors.white,
                 leading: Icon(Icons.post_add),
                 title: const Text('My Post'),
                 onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => MySites(user)))},
@@ -90,6 +103,9 @@ class NavDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
               child: ListTile(
+                selectedTileColor: color3,
+                iconColor: lightBlue,
+                textColor: Colors.white,
                 leading: Icon(Icons.format_quote_sharp),
                 title: const Text('philosophy'),
                 onTap: () => {Navigator.push(context, MaterialPageRoute(builder: (context) => QuotesData()))},
@@ -98,20 +114,32 @@ class NavDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
               child: ListTile(
+                selectedTileColor: color3,
+                iconColor: lightBlue,
+                textColor: Colors.white,
                 leading: Icon(Icons.info),
                 title: Text('Settings'),
-                onTap: () => {Navigator.of(context).pop()},
+                onTap: () => {
+                //   Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => OnlineUsersCounter(),
+                //   ),
+                // )
+                },
               ),
             ),
             if (FirebaseAuth.instance.currentUser != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(18, 1, 10, 1),
                 child: ListTile(
+                  selectedTileColor: color3,
+                  iconColor: lightBlue,
+                  textColor: Colors.white,
                   leading: Icon(Icons.exit_to_app),
                   title: Text('Logout'),
                   onTap: () => {
-                    print(FirebaseAuth.instance.currentUser?.phoneNumber),
-                    print(FirebaseAuth.instance.currentUser?.email),
+                    Database().onlineStatus(false),
                     FirebaseAuth.instance.signOut(),
                     Navigator.pushReplacement(
                       context,

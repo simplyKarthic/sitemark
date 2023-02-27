@@ -206,7 +206,7 @@ _showFullScreenImage(BuildContext context, documents) {
         child: Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: (documents["viewCount"] > 10)
+            gradient: (documents["commentCount"] > 10)
                 ? LinearGradient(
               colors: [
                 Color(0xFFFAA86E),

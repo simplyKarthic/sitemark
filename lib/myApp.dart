@@ -2,6 +2,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/routes.dart';
 import 'package:provider/provider.dart';
+import 'package:sitemark/screens/constantData.dart';
 import 'database/auth_service.dart';
 import 'database/database.dart';
 import 'models/ProxyData.dart';
@@ -49,12 +50,11 @@ class MyApp extends StatelessWidget {
                     child: MaterialApp(
                       title: "my app",
                       theme: ThemeData(
+                        scaffoldBackgroundColor: primaryColor,
                         colorScheme: ColorScheme(
                           brightness: Brightness.light,
-                          primary: Color.fromRGBO(133, 206, 225, 1.0),
-                          onPrimary: Colors.black54,
-                          // Colors that are not relevant to AppBar in LIGHT mode:
-                          primaryVariant: Colors.grey,
+                          primary: primaryColor,
+                          onPrimary: lightBlue,
                           secondary: Colors.grey,
                           secondaryVariant: Colors.grey,
                           onSecondary: Colors.grey,

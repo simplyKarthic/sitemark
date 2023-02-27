@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,11 +56,9 @@ class _QuotesDataState extends State<QuotesData> {
     List mixColors = [_one, _two, _three, _four, _five];
 
     return Scaffold(
-      drawer: NavDrawer(),
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Philosophy"),
-        backgroundColor: Colors.blue,
       ),
       body: _quotes.length > 0
           ? Scrollbar(
@@ -110,12 +109,16 @@ class _QuotesDataState extends State<QuotesData> {
                         var status = await Database(uid: user.uid).addNewPost(
                             title: _quotes[index]['author'],
                             description: _quotes[index]['content'],
-                            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxylg_Nb9wzowg40KOGpWCW4BDvII7Bgl9MT3dSGus7sLLy8b',
+                            imageUrl: '',
                             profileName: userProfileData.name,
                             postedTime: Timestamp.now(),
                             postId: _quotes[index]['_id'],
-                            viewCount: 1
+                            commentCount: 1
                         );
+                        if(status) {
+                          Fluttertoast.showToast(msg:'Post added Successfully', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 3);
+                          Navigator.pop(context);
+                        }
                       },
                     ),
                   );

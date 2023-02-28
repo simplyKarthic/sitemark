@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sitemark/screens/viewPost.dart';
-
 import '../database/database.dart';
 import '../functions/randomGen.dart';
-import '../models/ProxyData.dart';
 import '../models/user.dart';
+import 'chats/chatMain.dart';
 import 'constantData.dart';
 
 class PostUI extends StatefulWidget {
@@ -20,7 +20,6 @@ class PostUI extends StatefulWidget {
   final String postId;
   final String postedUserId;
   final String routedFrom;
-  final String currentUserUid;
 
   PostUI({
     Key key,
@@ -33,7 +32,6 @@ class PostUI extends StatefulWidget {
     @required this.postId,
     @required this.postedUserId,
     @required this.routedFrom,
-    @required this.currentUserUid
   }) : super(key: key);
 
   @override
@@ -49,6 +47,8 @@ class _PostUIState extends State<PostUI> {
 
   @override
   Widget build(BuildContext context) {
+    UserData user = Provider.of<UserData>(context);
+    UserProfileData userProfileData = Provider.of<UserProfileData>(context);
     int desLen = (widget.description.length < 210) ? widget.description.length : 210;
     return Container(
         margin: EdgeInsets.only(left: 5, right: 5),
@@ -61,14 +61,14 @@ class _PostUIState extends State<PostUI> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               Text(
                 widget.title,
                 style: GoogleFonts.openSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ]),
             SizedBox(
-              height: 8,
+              height: 9,
             ),
             GestureDetector(
               onTap: () => Navigator.push(
@@ -132,9 +132,12 @@ class _PostUIState extends State<PostUI> {
               height: 4,
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Text(
-                "${widget.postedTime} • ${widget.profileName}",
-                style: GoogleFonts.openSans(color: lightBlue, fontSize: 12, fontWeight: FontWeight.w600),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: Text(
+                  "${widget.postedTime} • ${widget.profileName}",
+                  style: GoogleFonts.openSans(color: lightBlue, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
               ),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -169,18 +172,23 @@ class _PostUIState extends State<PostUI> {
                   SizedBox(
                     width: 10,
                   ),
-                  (widget.currentUserUid != widget.postedUserId)?
+                  (user.uid != widget.postedUserId)?
                   ElevatedButton(
                     onPressed: () async {
-                      await Database(uid: widget.currentUserUid).startChat(
-                          chatting: true,
-                          chatId: getRandomString(10),
-                          from_uid: widget.currentUserUid,
-                          to_uid: widget.postedUserId,
-                          postId: widget.postId,
-                          postTitle: widget.title,
-                          fromName: 'userProfileData.name',
-                          toName: widget.profileName);
+                        if(userProfileData.chattingUsers.contains(widget.postedUserId)){
+                          Fluttertoast.showToast(msg: 'you are already chatting', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 3);
+                        }else{
+                          await Database(uid: user.uid).startChat(
+                              chatting: true,
+                              chatId: getRandomString(10),
+                              from_uid: user.uid,
+                              to_uid: widget.postedUserId,
+                              postId: widget.postId,
+                              postTitle: widget.title,
+                              fromName: userProfileData.name,
+                              toName: widget.profileName);
+                        }
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatMain()));
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

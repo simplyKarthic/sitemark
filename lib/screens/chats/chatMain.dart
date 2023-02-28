@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:sitemark/screens/constantData.dart';
+import '../../functions/timeConverter.dart';
 import '../../models/user.dart';
-import 'chatbox.dart';
 import 'conversationTile.dart';
 
 class ChatMain extends StatefulWidget {
@@ -11,6 +13,7 @@ class ChatMain extends StatefulWidget {
   @override
   State<ChatMain> createState() => _ChatMainState();
 }
+
 //todo: design UI for chat members
 class _ChatMainState extends State<ChatMain> {
   @override
@@ -22,54 +25,59 @@ class _ChatMainState extends State<ChatMain> {
           title: Text("Chat Room"),
         ),
         body: StreamBuilder(
-          stream:
-              FirebaseFirestore.instance.collection('chats').where('userIds', arrayContains: user.uid).orderBy('fromLastSeen', descending: true).snapshots(),
+          stream: FirebaseFirestore.instance.collection('chats').where('userIds', arrayContains: user.uid).orderBy('lastMsgTime', descending: true).snapshots(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+
+            if(snapshot.connectionState == ConnectionState.waiting) return CircularProgressIndicator();
+            if (snapshot.hasData && snapshot.data.docs.isNotEmpty){
+              List<DocumentSnapshot> documents = snapshot.data.docs;
+              return ListView.builder(
+                itemCount: documents.length,
+                shrinkWrap: true,
+                padding: EdgeInsets.only(top: 16),
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
+                  String timer = getTimeElapsed(documents[index]['lastMsgTime']);
+                  String toProfilePicUrl = (user.uid == documents[index]['userIds'][0]) ? documents[index]['userIds'][1]: documents[index]['userIds'][0];
+                  return StreamBuilder(
+                    stream: FirebaseFirestore.instance.collection('User').doc(toProfilePicUrl).snapshots(),
+                    builder: (context, profileSnapshot) {
+                      if(profileSnapshot.connectionState == ConnectionState.waiting) return CircularProgressIndicator();
+                      var documentFields = profileSnapshot.data;
+                      return ConversationTile(
+                        name: myPost ? documents[index]['fromName'] : documents[index]['toName'],
+                        messageText: documents[index]['lastMessage'],
+                        imageUrl: documentFields['profilepic']??'',
+                        time: timer,
+                        isMessageRead: (index == 0 || index == 3) ? true : false,
+                        chatID: documents[index]['chatID'],
+                        user: user,
+                      );
+                    }
+                  );
+                },
+              );
+            }else{
+              return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_outlined,
+                        color: Colors.white,
+                        size: 60,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'No chats Yet ...!',
+                        style: GoogleFonts.openSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ));
             }
-            List<DocumentSnapshot> documents = snapshot.data.docs;
-
-            return ListView.builder(
-              itemCount: documents.length,
-              shrinkWrap: true,
-              padding: EdgeInsets.only(top: 16),
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index){
-                bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
-                return ConversationTile(
-                  name: myPost ? documents[index]['fromName'] : documents[index]['toName'],
-                  messageText: documents[index]['postTitle'],
-                  imageUrl: '',
-                  time: '19min ago',
-                  isMessageRead: (index == 0 || index == 3) ? true : false,
-                  chatID: documents[index]['chatID'],
-                  user: user,
-
-                );
-              },
-            );
-
-
-            // return ListView.builder(
-            //     itemCount: documents.length,
-            //     itemBuilder: (context, index) {
-            //       bool myPost = userProfileData.postListID.contains(documents[index]['postId']);
-            //       return Container(
-            //           padding: EdgeInsets.all(15),
-            //           child: Container(
-            //             child: ElevatedButton(
-            //                 child: Text(myPost ? documents[index]['fromName'] : documents[index]['toName']),
-            //                 onPressed: () async {
-            //                   Navigator.pushReplacement(
-            //                     context,
-            //                     MaterialPageRoute(
-            //                       builder: (context) => ChatBox(chatID: documents[index]['chatID'], user: user),
-            //                     ),
-            //                   );
-            //                 }),
-            //           ));
-            //     });
           },
         ));
   }

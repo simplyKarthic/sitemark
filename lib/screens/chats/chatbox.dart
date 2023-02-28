@@ -1,26 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/models/user.dart';
-
 import '../../database/database.dart';
+import '../constantData.dart';
 
 class ChatBox extends StatefulWidget {
   String chatID;
   UserData user;
-  ChatBox({Key key, @required this.chatID, @required this.user}) : super(key: key);
+  String appBarName;
+  String profilePic;
+  ChatBox({Key key, @required this.chatID, @required this.user, @required  this.appBarName, @required this.profilePic}) : super(key: key);
 
   @override
   State<ChatBox> createState() => _ChatBoxState();
 }
 
-//todo: add ui and database setting for chat
 class _ChatBoxState extends State<ChatBox> {
+  bool showTime = false;
+  int tappedIndex = 0;
   @override
   Widget build(BuildContext context) {
     final TextEditingController myMessage = TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        title: Text("username"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(widget.profilePic),
+            ),
+            SizedBox(width: 10,),
+            Text(widget.appBarName),
+          ],
+        ),
       ),
       body: Stack(
         //mainAxisAlignment: MainAxisAlignment.end,
@@ -42,22 +55,39 @@ class _ChatBoxState extends State<ChatBox> {
                         SingleChildScrollView(
                           child: Column(
                             children: [
-                              Container(
-                                padding: EdgeInsets.only(left: 14, right: 14, top: 7, bottom: 7),
+                              //todo: send images in chat
+                              GestureDetector(
                                 child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: (widget.user.uid == documents[index]['sender_id'] ? Colors.blue[200] : Colors.grey.shade200),
+                                  padding: EdgeInsets.only(left: 14, right: 14, top: 7, bottom: 7),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: (widget.user.uid == documents[index]['sender_id'] ? Colors.blue[200] : Colors.grey.shade200),
+                                    ),
+                                    padding: EdgeInsets.all(16),
+                                    child: Text(
+                                      documents[index]['text'],
+                                      style: TextStyle(fontSize: 15),
+                                    ),
                                   ),
-                                  padding: EdgeInsets.all(16),
-                                  child: Text(
-                                    documents[index]['text'],
-                                    style: TextStyle(fontSize: 15),
-                                  ),
+                                ),
+                                onTap: (){
+                                  setState(() {
+                                    tappedIndex = index;
+                                    showTime = !showTime;
+                                  });
+                                },
+                              ),
+                              Visibility(
+                                visible: showTime && tappedIndex == index,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.timer, color: Colors.white30,size: 12,),
+                                    Text(formatTimestamp(documents[index]['timeStamp']),style: TextStyle(color: Colors.white30, fontSize: 12),),
+                                  ],
                                 ),
                               ),
                               (documents.length == index+1)?SizedBox(height: 70,):Container()
-
                             ],
                           ),
                         ),
@@ -74,20 +104,20 @@ class _ChatBoxState extends State<ChatBox> {
               padding: EdgeInsets.only(left: 10,bottom: 10,top: 10),
               height: 60,
               width: double.infinity,
-              color: Colors.white,
+              color: secondaryColor,
               child: Row(
                 children: <Widget>[
                   GestureDetector(
                     onTap: (){
                     },
                     child: Container(
-                      height: 30,
-                      width: 30,
+                      height: 35,
+                      width: 35,
                       decoration: BoxDecoration(
-                        color: Colors.lightBlue,
+                        color: color1,
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      child: Icon(Icons.add, color: Colors.white, size: 20, ),
+                      child: Icon(Icons.camera_alt, color: Colors.white70, size: 20, ),
                     ),
                   ),
                   SizedBox(width: 15,),
@@ -100,7 +130,7 @@ class _ChatBoxState extends State<ChatBox> {
                       controller: myMessage,
                       decoration: InputDecoration(
                           hintText: "Write message...",
-                          hintStyle: TextStyle(color: Colors.black54),
+                          hintStyle: TextStyle(color: Colors.white70),
                           border: InputBorder.none
                       ),
                     ),
@@ -113,10 +143,9 @@ class _ChatBoxState extends State<ChatBox> {
                           chatId:widget.chatID,
                           text: myMessage.text
                       );
-                      print("widget.chatID: ${widget.chatID}");
                     },
-                    child: Icon(Icons.send,color: Colors.white,size: 18,),
-                    backgroundColor: Colors.blue,
+                    child: Icon(Icons.send,color: Colors.white70,size: 18,),
+                    backgroundColor: color1,
                     elevation: 0,
                   ),
                 ],
@@ -127,4 +156,17 @@ class _ChatBoxState extends State<ChatBox> {
       ),
     );
   }
+
+  String formatTimestamp(Timestamp timestamp) {
+    DateTime dateTime = timestamp.toDate();
+    String hour = (dateTime.hour % 12).toString().padLeft(2, '0');
+    if (hour == '00') {
+      hour = '12';
+    }
+    String minute = dateTime.minute.toString().padLeft(2, '0');
+    String period = dateTime.hour < 12 ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
+
 }

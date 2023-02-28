@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/user.dart';
+import '../constantData.dart';
 import 'chatbox.dart';
 
 class ConversationTile extends StatefulWidget{
@@ -21,18 +23,18 @@ class _ConversationListState extends State<ConversationTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChatBox(chatID: widget.chatID, user: widget.user),
+            builder: (context) => ChatBox(chatID: widget.chatID, user: widget.user, appBarName:widget.name, profilePic: widget.imageUrl),
           ),
         );
       },
       child: Container(
-          decoration: new BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Colors.white12,
             borderRadius: new BorderRadius.all(new Radius.circular(10.0)),
-
+            border: Border.all(color: lightBlue),
           ),
         margin: EdgeInsets.only(left: 5,right: 5,top: 10,bottom: 10),
         padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 10),
@@ -41,9 +43,9 @@ class _ConversationListState extends State<ConversationTile> {
             Expanded(
               child: Row(
                 children: <Widget>[
-                  (widget.imageUrl != '') ?
+                  (widget.imageUrl.length>5) ?
                   CircleAvatar(
-                    radius: 52,
+                    radius: 25,
                     backgroundImage: NetworkImage(widget.imageUrl),
                   ):
                   Container(
@@ -52,12 +54,12 @@ class _ConversationListState extends State<ConversationTile> {
                     child: Center(
                       child: Icon(
                         Icons.person,
-                        size: 50,
-                        color: Colors.grey,
+                        size: 45,
+                        color: Colors.white,
                       ),
                     ),
                     decoration: new BoxDecoration(
-                      color: Colors.white,
+                      color: lightBlue,
                       borderRadius: new BorderRadius.all(new Radius.circular(60.0)),
                     ),
                   ),
@@ -68,9 +70,9 @@ class _ConversationListState extends State<ConversationTile> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(widget.name, style: TextStyle(fontSize: 16),),
+                          Text(widget.name, style: TextStyle(color: lightBlue, fontSize: 16, fontWeight: FontWeight.w600),),
                           SizedBox(height: 6,),
-                          Text(widget.messageText,style: TextStyle(fontSize: 13,color: Colors.grey.shade600, fontWeight: widget.isMessageRead?FontWeight.bold:FontWeight.normal),),
+                          Text(widget.messageText,style: TextStyle(fontSize: 13,color: Colors.white, fontWeight: widget.isMessageRead?FontWeight.bold:FontWeight.normal),),
                         ],
                       ),
                     ),
@@ -78,10 +80,11 @@ class _ConversationListState extends State<ConversationTile> {
                 ],
               ),
             ),
-            Text(widget.time,style: TextStyle(fontSize: 12,fontWeight: widget.isMessageRead?FontWeight.bold:FontWeight.normal),),
+            Text(widget.time,style: TextStyle(fontSize: 12,fontWeight: widget.isMessageRead?FontWeight.bold:FontWeight.normal, color: Colors.white70),),
           ],
         ),
       ),
     );
   }
+
 }

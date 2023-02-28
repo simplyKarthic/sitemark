@@ -19,7 +19,7 @@ class Database {
     try {
       await userCollection
           .doc(uid)
-          .set({'name': name, 'uid': uid, 'postListID': [], 'profilepic': profilePic, 'lastSeen': Timestamp.now(), 'authby': authby});
+          .set({'name': name, 'uid': uid, 'postListID': [], 'chattingUsers': [],'profilepic': profilePic, 'lastSeen': Timestamp.now(), 'authby': authby});
 
       return true;
     } on FirebaseException catch (err) {
@@ -83,11 +83,11 @@ class Database {
   Future<bool> startChat(
       {bool chatting, String chatId, String from_uid, String to_uid, String postId, String postTitle, String fromName, String toName}) async {
     try {
-      var addPostResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
-        transaction.set(FirebaseFirestore.instance.collection('chats').doc(chatId), {
+      var startChatResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.set(chatsCollection.doc(chatId), {
           'chatID': chatId,
-          'fromLastSeen': Timestamp.now(),
-          'toLastSeen': Timestamp.now(),
+          'lastMsgTime': Timestamp.now(),
+          'lastMessage': '',
           'userIds': [from_uid, to_uid],
           'postTitle': postTitle,
           'postId': postId,
@@ -95,7 +95,17 @@ class Database {
           'toName': toName,
         });
 
+        transaction.update(userCollection.doc(from_uid), {
+          'chattingUsers': FieldValue.arrayUnion([to_uid])
+        });
+
+        transaction.update(userCollection.doc(to_uid), {
+          'chattingUsers': FieldValue.arrayUnion([from_uid])
+        });
+
       });
+
+
 
       return true;
     } on FirebaseException catch (err) {
@@ -109,11 +119,20 @@ class Database {
 
   Future<bool> sendMessage({String chatId, String senderID, String text}) async {
     try {
-      await chatsCollection
-          .doc(chatId)
-          .collection('messages')
-          .doc(getRandomString(15))
-          .set({'sender_id': senderID, 'text': text, 'timeStamp': Timestamp.now()});
+      var sendMessageResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.set(chatsCollection
+            .doc(chatId)
+            .collection('messages').doc(getRandomString(15)), {
+          'sender_id': senderID, 'text': text, 'timeStamp': Timestamp.now()
+        });
+        
+        transaction.update(chatsCollection
+            .doc(chatId), {
+          'lastMessage': text,
+          'lastMsgTime': Timestamp.now(),
+        });
+        
+      });
       return true;
     } on FirebaseException catch (err) {
       print(err);
@@ -188,5 +207,6 @@ class Database {
       return false;
     }
   }
+
 
 }

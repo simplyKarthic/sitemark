@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sitemark/screens/constantData.dart';
 import 'package:sitemark/screens/postUI.dart';
+import '../functions/timeConverter.dart';
 import '../models/ProxyData.dart';
 import '../models/user.dart';
 import '../navDrawer.dart';
@@ -98,7 +99,7 @@ class _HomePageState extends State<HomePage>  with WidgetsBindingObserver {
                 return const Center(child: CircularProgressIndicator());
               }
               List<DocumentSnapshot> documents = snapshot.data.docs;
-              if (documents.length > 0) {
+              if (documents.length > 0 && user != null) {
                 return ListView.builder(
                     itemCount: documents.length,
                     itemBuilder: (context, index) {
@@ -115,40 +116,29 @@ class _HomePageState extends State<HomePage>  with WidgetsBindingObserver {
                             postId: documents[index]["postId"],
                             postedUserId: documents[index]["uid"],
                             routedFrom: 'home',
-                            currentUserUid :user.uid,
                         ),
                       );
                     });
               } else {
-                return Container(
-                  child: Text("No data in feed"),
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.newspaper, size: 60,color: Colors.white70,),
+                      SizedBox(height: 20,),
+                      Text('No data in feed',
+                          textAlign: TextAlign.center, style: GoogleFonts.openSans(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Text('- You can Start Posting -',
+                          textAlign: TextAlign.center, style: GoogleFonts.openSans(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
                 );
               }
             }
             ),
     );
-  }
-
-  getTimeElapsed(Timestamp timestamp){
-    final DateTime now = DateTime.now();
-    final DateTime dateTime = timestamp.toDate();
-    final Duration difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      final int days = difference.inDays;
-      final int hours = difference.inHours.remainder(24);
-      return '${days}d, ${hours}hr ago';
-    } else if (difference.inHours > 0) {
-      final int hours = difference.inHours;
-      final int minutes = difference.inMinutes.remainder(60);
-      return '${hours}hr, $minutes min ago';
-    } else {
-      final int minutes = difference.inMinutes;
-      if(minutes == 0){
-        return 'just now';
-      }
-      return '$minutes minutes ago';
-    }
   }
 
 }

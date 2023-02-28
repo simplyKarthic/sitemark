@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sitemark/screens/postUI.dart';
 import '../database/database.dart';
+import '../functions/timeConverter.dart';
 import '../models/ProxyData.dart';
 import '../models/user.dart';
 import 'constantData.dart';
@@ -62,80 +63,11 @@ class _ViewPostState extends State<ViewPost> {
                       imageUrl: widget.imageUrl,
                       postId: widget.postId,
                       routedFrom: 'viewPost',
-                      currentUserUid: user.uid,
                       postedUserId: widget.posterUserUid,
                   ),
                 ),
-                // (commentsAvailable)
-                //     ? Column(
-                //         children: [
-                //           Row(
-                //             children: [
-                //               SizedBox(width: 20.0),
-                //               Container(
-                //                 width: 2.0,
-                //                 height: 30.0,
-                //                 color: lightBlue,
-                //                 margin: EdgeInsets.only(right: 8.0),
-                //               ),
-                //             ],
-                //           ),
-                //           Container(
-                //             margin: EdgeInsets.only(left: 15, right: 5),
-                //             padding: EdgeInsets.all(10),
-                //             decoration: new BoxDecoration(
-                //               color: secondaryColor,
-                //               borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                //               border: Border.all(color: lightBlue),
-                //             ),
-                //             child: Column(
-                //               crossAxisAlignment: CrossAxisAlignment.start,
-                //               mainAxisAlignment: MainAxisAlignment.start,
-                //               children: [
-                //                 Text(
-                //                   'comment.user',
-                //                   style: TextStyle(fontWeight: FontWeight.bold, color: lightBlue),
-                //                 ),
-                //                 SizedBox(
-                //                   height: 10,
-                //                 ),
-                //                 Container(
-                //                   decoration: new BoxDecoration(
-                //                     color: Colors.white24,
-                //                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                //                   ),
-                //                   padding: EdgeInsets.all(8),
-                //                   child: Text(
-                //                       "in this example, we use the Widgets Binding Observer mixin to listen for changes in the app's lifecycle state. We also define a _counterRef variable to reference the counter node in our Realtime Database.",
-                //                       style: TextStyle(color: Colors.white)),
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //         ],
-                //       )
-                //     : Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           SizedBox(
-                //             height: 40,
-                //           ),
-                //           Icon(
-                //             Icons.pets,
-                //             color: Colors.white54,
-                //             size: 70,
-                //           ),
-                //           SizedBox(
-                //             height: 15,
-                //           ),
-                //           Text(
-                //             'No Comments Yet ...!',
-                //             style: GoogleFonts.openSans(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                //           )
-                //         ],
-                //       )
                 StreamBuilder(
-                    stream: FirebaseFirestore.instance.collection('generalFeeds').doc(widget.postId).collection('Comments').snapshots(),
+                    stream: FirebaseFirestore.instance.collection('generalFeeds').doc(widget.postId).collection('Comments').orderBy('commentTime', descending: true).snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
@@ -283,7 +215,9 @@ class _ViewPostState extends State<ViewPost> {
                     child: TextField(
                       style: TextStyle(color: Colors.white),
                       textInputAction: TextInputAction.go,
-                      onSubmitted: (value) async {},
+                      onSubmitted: (value) async {
+
+                      },
                       controller: comment,
                       decoration: InputDecoration(hintText: "Add a comment...", hintStyle: TextStyle(color: Colors.white), border: InputBorder.none),
                     ),
@@ -293,7 +227,10 @@ class _ViewPostState extends State<ViewPost> {
                   ),
                   FloatingActionButton(
                     onPressed: () async {
-                      await Database(uid: user.uid).commentFunction(userName: userProfileData.name, commentData: comment.text, postID: widget.postId);
+                      if(comment.text.length>1){
+                        await Database(uid: user.uid).commentFunction(userName: userProfileData.name, commentData: comment.text, postID: widget.postId);
+                        comment.clear();
+                      }
                     },
                     child: Icon(
                       Icons.send,
@@ -310,28 +247,6 @@ class _ViewPostState extends State<ViewPost> {
         ],
       ),
     );
-  }
-
-  getTimeElapsed(Timestamp timestamp){
-    final DateTime now = DateTime.now();
-    final DateTime dateTime = timestamp.toDate();
-    final Duration difference = now.difference(dateTime);
-
-    if (difference.inDays > 0) {
-      final int days = difference.inDays;
-      final int hours = difference.inHours.remainder(24);
-      return '${days}d, ${hours}hr ago';
-    } else if (difference.inHours > 0) {
-      final int hours = difference.inHours;
-      final int minutes = difference.inMinutes.remainder(60);
-      return '${hours}hr, $minutes min ago';
-    } else {
-      final int minutes = difference.inMinutes;
-      if(minutes == 0){
-        return 'just now';
-      }
-      return '$minutes minutes ago';
-    }
   }
 
 }

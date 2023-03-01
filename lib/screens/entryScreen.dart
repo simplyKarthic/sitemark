@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../database/auth_service.dart';
 import 'Home.dart';
 import 'constantData.dart';
@@ -17,8 +17,7 @@ class entryScreen extends StatefulWidget {
 }
 
 class _entryScreenState extends State<entryScreen> {
-
-
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   bool _passwordVisible = false;
   bool _obsecureTextState = true;
   bool errorMessageTime = true;
@@ -29,6 +28,27 @@ class _entryScreenState extends State<entryScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  void initiateFirebaseMessaging() async{
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+    await _firebaseMessaging.requestPermission(sound: true, badge: true, alert: true);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.notification != null) {
+        print("Local message: ${message.notification.title}");
+      }
+    });
+  }
+
   Future<bool> _onWillPop() async {
     return false;
   }
@@ -37,6 +57,7 @@ class _entryScreenState extends State<entryScreen> {
   void initState() {
     _passwordVisible = false;
     _obsecureTextState = true;
+    initiateFirebaseMessaging();
   }
 
   @override

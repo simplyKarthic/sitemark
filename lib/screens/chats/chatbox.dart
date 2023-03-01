@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:sitemark/models/user.dart';
 import '../../database/database.dart';
@@ -26,9 +27,25 @@ class _ChatBoxState extends State<ChatBox> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            (widget.profilePic.length>5)?
             CircleAvatar(
               radius: 20,
               backgroundImage: NetworkImage(widget.profilePic),
+            ):
+            Container(
+              width: 40,
+              height: 40,
+              child: Center(
+                child: Icon(
+                  Icons.person,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
+              decoration: new BoxDecoration(
+                color: lightBlue,
+                borderRadius: new BorderRadius.all(new Radius.circular(60.0)),
+              ),
             ),
             SizedBox(width: 10,),
             Text(widget.appBarName),
@@ -81,6 +98,7 @@ class _ChatBoxState extends State<ChatBox> {
                               Visibility(
                                 visible: showTime && tappedIndex == index,
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Icon(Icons.timer, color: Colors.white30,size: 12,),
                                     Text(formatTimestamp(documents[index]['timeStamp']),style: TextStyle(color: Colors.white30, fontSize: 12),),
@@ -128,6 +146,7 @@ class _ChatBoxState extends State<ChatBox> {
                         print("myMessage: ${myMessage.text}");
                       },
                       controller: myMessage,
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                           hintText: "Write message...",
                           hintStyle: TextStyle(color: Colors.white70),
@@ -143,6 +162,9 @@ class _ChatBoxState extends State<ChatBox> {
                           chatId:widget.chatID,
                           text: myMessage.text
                       );
+                      final fcmToken = await FirebaseMessaging.instance.getToken();
+                      myMessage.clear();
+                      print("fcmToken: $fcmToken");
                     },
                     child: Icon(Icons.send,color: Colors.white70,size: 18,),
                     backgroundColor: color1,

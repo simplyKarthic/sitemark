@@ -125,7 +125,7 @@ class _QuotesDataState extends State<QuotesData> {
                 },
               ),
             )
-          : const Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator(color: Colors.white,)),
     );
   }
 }

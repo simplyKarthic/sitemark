@@ -51,6 +51,7 @@ dependencies:
   image_cropper: ^3.0.1
   google_fonts: ^4.0.3
   firebase_database: ^10.0.13
+  firebase_messaging: ^14.2.5
 
 
 dev_dependencies:

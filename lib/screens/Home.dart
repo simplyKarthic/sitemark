@@ -95,8 +95,9 @@ class _HomePageState extends State<HomePage>  with WidgetsBindingObserver {
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance.collection('generalFeeds').orderBy('postedTime', descending: true).snapshots(),
             builder: (context, snapshot) {
+              if(snapshot.connectionState == ConnectionState.waiting) return Center(child: CircularProgressIndicator(color: Colors.white,));
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator(color: Colors.white,));
               }
               List<DocumentSnapshot> documents = snapshot.data.docs;
               if (documents.length > 0 && user != null) {

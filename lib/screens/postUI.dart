@@ -7,6 +7,7 @@ import 'package:sitemark/screens/viewPost.dart';
 import '../database/database.dart';
 import '../functions/randomGen.dart';
 import '../models/user.dart';
+import 'addSite.dart';
 import 'chats/chatMain.dart';
 import 'constantData.dart';
 
@@ -41,7 +42,6 @@ class PostUI extends StatefulWidget {
 class _PostUIState extends State<PostUI> {
   String firstHalf;
   String secondHalf;
-  bool _showFullText = false;
   int onlineUsers = 0;
 
 
@@ -49,7 +49,7 @@ class _PostUIState extends State<PostUI> {
   Widget build(BuildContext context) {
     UserData user = Provider.of<UserData>(context);
     UserProfileData userProfileData = Provider.of<UserProfileData>(context);
-    int desLen = (widget.description.length < 210) ? widget.description.length : 210;
+
     return Container(
         margin: EdgeInsets.only(left: 5, right: 5),
         decoration: BoxDecoration(
@@ -71,10 +71,21 @@ class _PostUIState extends State<PostUI> {
               height: 9,
             ),
             GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewPost(
+              onTap: () {
+                print("ee");
+                print(widget.routedFrom);
+                if(widget.routedFrom == 'editPost'){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => addSite(context, title: widget.title, description: widget.description, imageUrl:widget.imageUrl, postId: widget.postId)
+                      )
+                  );
+                }else{
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ViewPost(
                             title: widget.title,
                             description: widget.description,
                             imageUrl: widget.imageUrl,
@@ -82,8 +93,10 @@ class _PostUIState extends State<PostUI> {
                             time: widget.postedTime,
                             views: widget.commentCount,
                             postId: widget.postId,
-                        posterUserUid: widget.postedUserId,
-                          ))),
+                            posterUserUid: widget.postedUserId,
+                          )));
+                }
+              },
               child: Container(
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -206,7 +219,7 @@ class _PostUIState extends State<PostUI> {
                   ):
                   ElevatedButton(
                     onPressed: () async {
-                      await FirebaseFirestore.instance.collection('generalFeeds').doc(widget.postId).delete();
+                      Database(uid: user.uid).deletePost(postId: widget.postId);
                       if(widget.routedFrom == "viewPost"){
                         Navigator.pop(context);
                       }

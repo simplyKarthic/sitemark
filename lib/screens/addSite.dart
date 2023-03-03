@@ -5,15 +5,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:math';
+import 'package:sitemark/screens/constantData.dart';
 import '../database/database.dart';
 import '../functions/getImageForPost.dart';
 import '../functions/randomGen.dart';
 import '../models/user.dart';
 
 class addSite extends StatefulWidget {
-  const addSite(BuildContext context, {Key key}) : super(key: key);
 
+  String title;
+  String description;
+  String imageUrl;
+  String postId;
+
+  addSite(BuildContext context, {Key key, @required this.title, @required this.description, @required this.imageUrl, @required this.postId}) : super(key: key);
   @override
   State<addSite> createState() => _addSiteState();
 }
@@ -23,6 +28,7 @@ class _addSiteState extends State<addSite> {
   String _description = '';
   String _title = '';
   File _croppedImage;
+  String profileFileUrl = '';
 
   setImage(File imageFile) {
     setState(() {
@@ -46,43 +52,22 @@ class _addSiteState extends State<addSite> {
       return fileUrl;
     }
 
-    uploadPostPicture() async {
-      if (_croppedImage != null) {
-        String profileFileUrl = await uploadFile(_croppedImage, user, 'postPic');
-        print("profileFileUrl: $profileFileUrl");
-
-        if (profileFileUrl == null) {
-          Fluttertoast.showToast(msg: 'File update failed, Try later', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 3);
-          Navigator.pop(context);
-          return null;
-        }else{
-          await Database(uid: user.uid).addNewPost(
-            title: _title,
-            description: _description,
-            imageUrl: profileFileUrl,
-            postedTime: Timestamp.now(),
-            postId: getRandomString(10),
-            profileName: userProfileData.name
-          );
-        }
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Post'),
+        title: (widget.title == null) ? Text('Add New Post'): Text('Edit Post'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Form(
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(left: 5,right: 5,top: 50,bottom: 50),
+          height: MediaQuery.of(context).size.height,
+          child: Form(
             key: _formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 GestureDetector(
                     onTap: () {
-                      print("printer tapped");
                       showDialog(
                         context: context,
                         builder: (context) {
@@ -96,8 +81,35 @@ class _addSiteState extends State<addSite> {
                     },
                     child: Wrap(
                       children: [
-                        (_croppedImage != null)
-                            ? Container(
+                        (_croppedImage == null && (widget.imageUrl == null || widget.imageUrl == ''))?
+                        Container(
+                          width: 120.0,
+                          height: 120.0,
+                          child: Center(
+                            child: Icon(
+                              Icons.folder_copy_outlined,
+                              size: 75,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          decoration: new BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: new BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ):
+                        (widget.imageUrl != null)?
+                        Container(
+                          width: 120.0,
+                          height: 120.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(
+                              image: new NetworkImage(widget.imageUrl),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ):
+                        Container(
                                 width: 120.0,
                                 height: 120.0,
                                 decoration: BoxDecoration(
@@ -107,29 +119,20 @@ class _addSiteState extends State<addSite> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                              )
-                            : Container(
-                                width: 120.0,
-                                height: 120.0,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.folder_copy_outlined,
-                                    size: 75,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                decoration: new BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: new BorderRadius.all(Radius.circular(8)),
-                                ),
                               ),
                       ],
                     )),
                 Padding(
                   padding: EdgeInsets.all(2.0),
                   child: TextFormField(
+                      initialValue: widget.title,
+                    maxLines: 2,
+                    style: TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      icon: Icon(Icons.drive_file_rename_outline),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      filled: true,
+                      fillColor: Colors.white24,
+                      icon: Icon(Icons.drive_file_rename_outline, color: Colors.white),
                       hintText: 'I have a doubt in....',
                       labelText: 'Title *',
                     ),
@@ -145,10 +148,16 @@ class _addSiteState extends State<addSite> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(2.0),
                   child: TextFormField(
+                    initialValue: widget.description,
+                    maxLines: 5,
+                    style: TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      icon: Icon(Icons.link),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      filled: true,
+                      fillColor: Colors.white24,
+                      icon: Icon(Icons.abc, color: Colors.white),
                       hintText: 'type your detailed description about the post ',
                       labelText: 'Description',
                     ),
@@ -169,6 +178,8 @@ class _addSiteState extends State<addSite> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: secondaryColor,),
                           child: Text("Cancel"),
                           onPressed: () {
                             Navigator.of(context, rootNavigator: true).pop('Cancel');
@@ -178,12 +189,39 @@ class _addSiteState extends State<addSite> {
                           width: 8,
                         ),
                         ElevatedButton(
-                          child: Text("Add"),
+                          style: ElevatedButton.styleFrom(
+                            primary: secondaryColor,),
+                          child: (widget.title == null)?Text("Add"):Text("Save"),
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
-                              uploadPostPicture();
-                              Navigator.pop(context);
+                              if (_croppedImage != null) {
+                                profileFileUrl = await uploadFile(_croppedImage, user, 'postPic');
+                                if (profileFileUrl == null) {
+                                  Fluttertoast.showToast(msg: 'File update failed, Try later', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 3);
+                                  Navigator.pop(context);
+                                  return null;
+                                }
+                              }
+                              if(widget.title == null){
+                                await Database(uid: user.uid).addNewPost(
+                                    title: _title,
+                                    description: _description,
+                                    imageUrl: profileFileUrl,
+                                    postedTime: Timestamp.now(),
+                                    postId: getRandomString(10),
+                                    profileName: userProfileData.name
+                                );
+                              }else{
+                                await Database(uid: user.uid).editPost(
+                                  title: _title,
+                                  description: _description,
+                                  imageUrl: profileFileUrl,
+                                  postId: widget.postId,
+                                  profileName: userProfileData.name
+                                );
+                              }
+                                Navigator.pop(context);
                             }
                           },
                         ),
@@ -192,7 +230,7 @@ class _addSiteState extends State<addSite> {
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

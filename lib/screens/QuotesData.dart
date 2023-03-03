@@ -118,6 +118,7 @@ class _QuotesDataState extends State<QuotesData> {
                         if(status) {
                           Fluttertoast.showToast(msg:'Post added Successfully', toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 3);
                           Navigator.pop(context);
+                          Navigator.pop(context);
                         }
                       },
                     ),

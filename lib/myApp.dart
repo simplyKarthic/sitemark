@@ -51,6 +51,10 @@ class MyApp extends StatelessWidget {
                       title: "my app",
                       theme: ThemeData(
                         scaffoldBackgroundColor: primaryColor,
+                          inputDecorationTheme: const InputDecorationTheme(
+                            labelStyle: TextStyle(color: Colors.white),
+                            hintStyle: TextStyle(color: Colors.grey),
+                          ),
                         colorScheme: ColorScheme(
                           brightness: Brightness.light,
                           primary: primaryColor,

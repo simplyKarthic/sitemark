@@ -2,12 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sitemark/screens/postUI.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../database/database.dart';
+import '../functions/timeConverter.dart';
 import '../models/UrlData.dart';
 import '../models/user.dart';
 import 'addSite.dart';
-
 
 class MySites extends StatefulWidget {
   const MySites(UserData user, {Key key}) : super(key: key);
@@ -21,11 +22,10 @@ class _MySitesState extends State<MySites> {
   @override
   Widget build(BuildContext context) {
     UserData user = Provider.of<UserData>(context);
+    UserProfileData userProfileData = Provider.of<UserProfileData>(context);
+    List<dynamic> postIDs = userProfileData.postListID.reversed.toList();
     return Scaffold(
-      appBar: AppBar(
-          title: Text("My Post's"),
-          actions: <Widget>[
-
+      appBar: AppBar(title: Text("My Post's"), actions: <Widget>[
         IconButton(
           icon: Icon(
             Icons.add,
@@ -40,162 +40,41 @@ class _MySitesState extends State<MySites> {
             );
           },
         ),
-
-        (gridView == true)
-            ? IconButton(
-                icon: Icon(
-                  Icons.list_alt_outlined,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  setState(() {
-                    gridView = false;
-                  });
-                },
-              )
-            : IconButton(
-                icon: Icon(
-                  Icons.grid_view,
-                  color: Colors.white,
-                ),
-                onPressed: () async {
-                  setState(() {
-                    gridView = true;
-                  });
-                },
-              ),
-      ]
-      ),
+      ]),
       body: Center(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('User').doc(user.uid).collection('Post').snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData){
-              return const Center(child: CircularProgressIndicator());
-            }
-            List<DocumentSnapshot> documents = snapshot.data.docs;
-            if (gridView == true){
-              return GridView.builder(
-                itemCount: documents.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 4.0
+        child: ListView.builder(
+          itemCount: userProfileData.postListID.length,
+          itemBuilder: (context, index) {
+            return StreamBuilder(
+              stream: FirebaseFirestore.instance.collection('generalFeeds').doc(postIDs[index]).snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                var documents = snapshot.data;
+                String timer = getTimeElapsed(documents["postedTime"]);
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(vertical: 5.0),
+                  reverse: true,
+                  child: PostUI(
+                    title: documents['title'],
+                    description: documents['description'],
+                    commentCount: documents['commentCount'],
+                    postedTime: timer,
+                    profileName: documents['profileName'],
+                    imageUrl: documents['imageUrl'],
+                    postId: documents['postId'],
+                    routedFrom: 'editPost',
+                    postedUserId: documents['uid'],
                   ),
-                  itemBuilder: (context, index){
-                    return Container(
-                      padding: EdgeInsets.all(15),
-                      child: siteGridContainer(context, documents[index]),
-                    );
-                  }
-              );
-            }
-            return ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    padding: EdgeInsets.all(15),
-                    child: siteListContainer(context, documents[index])
-                  );
-               });
+                );
+              },
+            );
           },
         ),
       ),
     );
   }
-}
-
-siteGridContainer(BuildContext context, documents) {
-  return GestureDetector(
-    onTap: () {
-      _showFullScreenImage(context, documents);
-    },
-    child: Material(
-      borderRadius: BorderRadius.all(Radius.circular(15.0)),
-      elevation: 10,
-      shadowColor: Color(0xFFFFB583),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFFAA86E),
-              Color(0xFFFD9495),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-        ),
-        height: MediaQuery.of(context).size.height * 0.15,
-        width: MediaQuery.of(context).size.width * 0.27,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(
-              image: NetworkImage(
-                documents["imageUrl"],
-              ),
-              height: 50,
-              width: 50,
-            ),
-            Text(
-              documents["title"],
-              style: TextStyle(
-                fontSize: 17,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-siteListContainer(BuildContext context, documents) {
-  return GestureDetector(
-    onTap: () {
-      _showFullScreenImage(context, documents);
-    },
-    child: Material(
-      borderRadius: BorderRadius.all(Radius.circular(15.0)),
-      elevation: 10,
-      shadowColor: Color(0xFF3BBAFF),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color.fromRGBO(72, 159, 180, 1.0), Color.fromRGBO(133, 206, 225, 1.0)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
-        ),
-        height: 80,
-        width: MediaQuery.of(context).size.width * 0.95,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Image(
-              image: NetworkImage(
-                documents["imageUrl"],
-              ),
-              height: 50,
-              width: 50,
-            ),
-            Text(
-              documents["title"],
-              style: TextStyle(
-                fontSize: 17,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 _showFullScreenImage(BuildContext context, documents) {
@@ -208,18 +87,18 @@ _showFullScreenImage(BuildContext context, documents) {
           decoration: BoxDecoration(
             gradient: (documents["commentCount"] > 10)
                 ? LinearGradient(
-              colors: [
-                Color(0xFFFAA86E),
-                Color(0xFFFD9495),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            )
+                    colors: [
+                      Color(0xFFFAA86E),
+                      Color(0xFFFD9495),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  )
                 : LinearGradient(
-              colors: [Color.fromRGBO(133, 206, 225, 1.0), Color.fromRGBO(72, 159, 180, 1.0)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+                    colors: [Color.fromRGBO(133, 206, 225, 1.0), Color.fromRGBO(72, 159, 180, 1.0)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
           ),
           height: MediaQuery.of(context).size.height * 0.77,
           width: MediaQuery.of(context).size.width * 0.90,
@@ -241,9 +120,8 @@ _showFullScreenImage(BuildContext context, documents) {
                     ),
                   ),
                 ),
-
-                Container(padding: EdgeInsets.all(8), height: 130, color: Colors.grey[350], child: SingleChildScrollView(child: Text(documents["description"]))),
-
+                Container(
+                    padding: EdgeInsets.all(8), height: 130, color: Colors.grey[350], child: SingleChildScrollView(child: Text(documents["description"]))),
                 SizedBox(
                   height: 8,
                 ),
@@ -292,4 +170,3 @@ _showFullScreenImage(BuildContext context, documents) {
     },
   );
 }
-

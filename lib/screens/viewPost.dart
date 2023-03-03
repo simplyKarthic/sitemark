@@ -216,7 +216,6 @@ class _ViewPostState extends State<ViewPost> {
                       style: TextStyle(color: Colors.white),
                       textInputAction: TextInputAction.go,
                       onSubmitted: (value) async {
-
                       },
                       controller: comment,
                       decoration: InputDecoration(hintText: "Add a comment...", hintStyle: TextStyle(color: Colors.white), border: InputBorder.none),

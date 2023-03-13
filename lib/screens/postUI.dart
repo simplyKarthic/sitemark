@@ -125,27 +125,37 @@ class _PostUIState extends State<PostUI> {
                           ))),
                     ),
                     if (widget.imageUrl != '')
-                      Container(
-                        height: 110.0,
-                        width: 100.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: CircularProgressIndicator(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PhotoScreen(photoUrl: widget.imageUrl,
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(widget.imageUrl),
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
+                          ));
+                        },
+                        child: Container(
+                          height: 110.0,
+                          width: 100.0,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: CircularProgressIndicator(),
                               ),
-                            ),
-                          ],
+                              Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(widget.imageUrl),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                   ],
@@ -254,5 +264,37 @@ class _PostUIState extends State<PostUI> {
             ])
           ],
         ));
+  }
+}
+
+
+class PhotoScreen extends StatelessWidget {
+  final String photoUrl;
+
+  PhotoScreen({@required this.photoUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Photo'),
+      ),
+      body: Center(
+        child: Image.network(photoUrl,
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes
+                    : null,
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

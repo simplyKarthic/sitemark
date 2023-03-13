@@ -97,7 +97,7 @@ class _addSiteState extends State<addSite> {
                             borderRadius: new BorderRadius.all(Radius.circular(8)),
                           ),
                         ):
-                        (widget.imageUrl != null)?
+                        (widget.imageUrl != null && widget.imageUrl != '' && _croppedImage == null)?
                         Container(
                           width: 120.0,
                           height: 120.0,
@@ -214,9 +214,9 @@ class _addSiteState extends State<addSite> {
                                 );
                               }else{
                                 await Database(uid: user.uid).editPost(
-                                  title: _title,
-                                  description: _description,
-                                  imageUrl: profileFileUrl,
+                                  title: (_title != '')?_title:widget.title,
+                                  description: (_description != '')?_description:widget.description,
+                                  imageUrl: (widget.imageUrl != null && widget.imageUrl != '' && _croppedImage == null)?widget.imageUrl:profileFileUrl,
                                   postId: widget.postId,
                                   profileName: userProfileData.name
                                 );

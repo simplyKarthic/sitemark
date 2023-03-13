@@ -19,7 +19,23 @@ class Database {
     try {
       await userCollection
           .doc(uid)
-          .set({'name': name, 'uid': uid, 'postListID': [], 'chattingUsers': [], 'profilepic': profilePic, 'lastSeen': Timestamp.now(), 'authby': authby});
+          .set({'name': name, 'uid': uid, 'postListID': [], 'chattingUsers': [], 'profilepic': profilePic, 'lastSeen': Timestamp.now(), 'authby': authby, 'chatGptId': ''});
+
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  Future<bool> editProfile({String name, String imageUrl}) async {
+    try {
+      await userCollection
+          .doc(uid)
+          .update({'name': name, 'profilepic': imageUrl});
 
       return true;
     } on FirebaseException catch (err) {
@@ -111,6 +127,71 @@ class Database {
     }
   }
 
+  Future<bool> deleteAllPost({List postIds}) async {
+    try {
+      var sendMessageResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final instance = FirebaseFirestore.instance;
+        final batch = instance.batch();
+        print("postID: $postIds");
+        for(String item in postIds){
+          print("items: $item");
+          var collection = instance.collection('generalFeeds').doc(item).collection('Comments');
+          var snapshots = await collection.get();
+          for (var doc in snapshots.docs) {
+            batch.delete(doc.reference);
+          }
+
+          transaction.delete(feedsCollection.doc(item));
+
+          transaction.update(userCollection.doc(uid), {
+            'postListID': FieldValue.arrayRemove([item])
+          });
+        }
+        await batch.commit();
+      });
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  Future<bool> deleteAllChats({List chatIds, List userIDS}) async {
+    try {
+      var sendMessageResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final instance = FirebaseFirestore.instance;
+        final batch = instance.batch();
+
+        for(String item in chatIds){
+          var collection = instance.collection('chats').doc(item).collection('messages');
+          var snapshots = await collection.get();
+          for (var doc in snapshots.docs) {
+            batch.delete(doc.reference);
+          }
+          transaction.delete(chatsCollection.doc(item));
+        }
+
+        for(String uid in userIDS){
+          transaction.update(userCollection.doc(uid), {
+            'chattingUsers': FieldValue.arrayRemove([uid])
+          });
+        }
+        await batch.commit();
+      });
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+
   Future<bool> startChat(
       {bool chatting, String chatId, String from_uid, String to_uid, String postId, String postTitle, String fromName, String toName}) async {
     try {
@@ -155,6 +236,22 @@ class Database {
           'lastMessage': text,
           'lastMsgTime': Timestamp.now(),
         });
+      });
+      return true;
+    } on FirebaseException catch (err) {
+      print(err);
+      return false;
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  Future<bool> sendChatGpt({String chatId, String senderID, String text}) async {
+    try {
+      var sendMessageResponse = await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.set(
+            chatsCollection.doc(chatId).collection('gptMessages').doc(getRandomString(15)), {'sender_id': senderID, 'text': text, 'timeStamp': Timestamp.now()});
       });
       return true;
     } on FirebaseException catch (err) {

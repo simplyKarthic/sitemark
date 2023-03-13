@@ -14,7 +14,6 @@ class ChatMain extends StatefulWidget {
   State<ChatMain> createState() => _ChatMainState();
 }
 
-//todo: design UI for chat members
 class _ChatMainState extends State<ChatMain> {
   @override
   Widget build(BuildContext context) {

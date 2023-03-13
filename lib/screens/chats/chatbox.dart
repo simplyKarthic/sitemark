@@ -72,11 +72,11 @@ class _ChatBoxState extends State<ChatBox> {
                         SingleChildScrollView(
                           child: Column(
                             children: [
-                              //todo: send images in chat
                               GestureDetector(
                                 child: Container(
                                   padding: EdgeInsets.only(left: 14, right: 14, top: 7, bottom: 7),
                                   child: Container(
+                                    width: MediaQuery.of(context).size.width * 0.6,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
                                       color: (widget.user.uid == documents[index]['sender_id'] ? Colors.blue[200] : Colors.grey.shade200),
@@ -157,13 +157,20 @@ class _ChatBoxState extends State<ChatBox> {
                   SizedBox(width: 15,),
                   FloatingActionButton(
                     onPressed: () async {
-                      await Database(uid: widget.user.uid).sendMessage(
-                          senderID:widget.user.uid,
-                          chatId:widget.chatID,
-                          text: myMessage.text
-                      );
-                      final fcmToken = await FirebaseMessaging.instance.getToken();
+                      String myMsg = myMessage.text;
                       myMessage.clear();
+                      if(myMsg.length>1){
+                        await Database(uid: widget.user.uid).sendMessage(
+                            senderID:widget.user.uid,
+                            chatId:widget.chatID,
+                            text: myMsg
+                        );
+                      }else{
+
+                      }
+
+                      final fcmToken = await FirebaseMessaging.instance.getToken();
+
                       print("fcmToken: $fcmToken");
                     },
                     child: Icon(Icons.send,color: Colors.white70,size: 18,),

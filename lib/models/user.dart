@@ -18,11 +18,12 @@ class UserProfileData{
   String profilePic;
   Timestamp lastSeen;
   List<dynamic> chattingUsers;
+  String chatGptId;
 
-  UserProfileData({this.name, this.profilePic, this.postListID, this.authBy, this.lastSeen, this.chattingUsers});
+  UserProfileData({this.name, this.profilePic, this.postListID, this.authBy, this.lastSeen, this.chattingUsers, this.chatGptId});
 
   factory UserProfileData.error(){
-    return UserProfileData(name: '',profilePic: '', postListID: [], authBy: '', lastSeen: Timestamp.now(), chattingUsers:[]);
+    return UserProfileData(name: '',profilePic: '', postListID: [], authBy: '', lastSeen: Timestamp.now(), chattingUsers:[], chatGptId:'');
   }
 
   factory UserProfileData.fromFirebase(Map data){
@@ -32,7 +33,8 @@ class UserProfileData{
       postListID: data['postListID'] ?? [],
       profilePic: data['profilepic'] ?? '',
       lastSeen: data['lastSeen'] ?? Timestamp.now(),
-        chattingUsers: data['chattingUsers']?? [],
+      chattingUsers: data['chattingUsers']?? [],
+      chatGptId: data['chatGptId']?? '',
     );
   }
 

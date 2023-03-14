@@ -5,7 +5,7 @@ import 'package:sitemark/screens/entryScreen.dart';
 class RouteGenerator{
   static Route<dynamic> generateRoute(RouteSettings settings){
     final args = settings.arguments;
-
+    //todo:configure routes for main page
     switch(settings.name){
       case '/':
         return MaterialPageRoute(builder: (_)=>CircularProgressIndicator());

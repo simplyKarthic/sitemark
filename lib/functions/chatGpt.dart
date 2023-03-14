@@ -29,7 +29,7 @@ class OpenAI {
           chatId: gptId,
           text: _response
       );
-      return jsonDecode(response.body);
+      return jsonDecode(gptResponse.body);
     } else {
       await Database(uid: userId).sendChatGpt(
           senderID: gptId,

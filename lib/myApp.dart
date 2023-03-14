@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
                       )
                     ],
                     child: MaterialApp(
-                      title: "my app",
+                      title: "ThreadTalk",
                       theme: ThemeData(
                         scaffoldBackgroundColor: primaryColor,
                           inputDecorationTheme: const InputDecorationTheme(

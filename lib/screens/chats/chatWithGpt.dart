@@ -22,16 +22,6 @@ class _MyWidgetState extends State<ChatWithGpt> {
 
   void _getResponseFromAPI(String message, String gptId, String userId) async {
     final response = await OpenAI.getResponse(message, gptId, userId);
-    setState(() {
-      _response = response['choices'][0]['text'].trimLeft();
-    });
-    print("choices");
-    print(response['choices'][0]['text'].trimLeft());
-    await Database(uid: userId).sendChatGpt(
-        senderID: gptId,
-        chatId: gptId,
-        text: _response
-    );
   }
 
   @override

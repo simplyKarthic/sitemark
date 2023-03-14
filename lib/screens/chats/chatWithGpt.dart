@@ -21,7 +21,7 @@ class _MyWidgetState extends State<ChatWithGpt> {
   int tappedIndex = 0;
 
   void _getResponseFromAPI(String message, String gptId, String userId) async {
-    final response = await OpenAI.getResponse(message);
+    final response = await OpenAI.getResponse(message, gptId, userId);
     setState(() {
       _response = response['choices'][0]['text'].trimLeft();
     });

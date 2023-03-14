@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../database/database.dart';
 
 class OpenAI {
   static const String _baseUrl = "https://api.openai.com/v1/completions";
-  static const String _apiKey = "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";
+  static final String _apiKey = dotenv.env['CHAT_KEY'];
 
-  static Future<Map<String, dynamic>> getResponse(String prompt) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl'),
+  static Future<Map<String, dynamic>> getResponse(String prompt, String gptId, String userId) async {
+    final gptResponse = await http.post(
+      Uri.parse(_baseUrl),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_apiKey',
@@ -15,17 +17,26 @@ class OpenAI {
       body: jsonEncode(<String, dynamic>{
         "model": "text-davinci-003",
         "prompt": prompt,
-        "max_tokens": 20
+        "max_tokens": 100
       }),
     );
 
-    if (response.statusCode == 200) {
-      print("response: ${response.body}");
+    if (gptResponse.statusCode == 200) {
+      final response = jsonDecode(gptResponse.body);
+      String _response = response['choices'][0]['text'].trimLeft();
+      await Database(uid: userId).sendChatGpt(
+          senderID: gptId,
+          chatId: gptId,
+          text: _response
+      );
       return jsonDecode(response.body);
     } else {
-      print("status code: ${response.statusCode}");
-      print("reasonPhrase: ${response.reasonPhrase}");
-      throw Exception('Failed to get response from OpenAI API');
+      await Database(uid: userId).sendChatGpt(
+          senderID: gptId,
+          chatId: gptId,
+          text: "Error with status code: ${gptResponse.statusCode}, reason: ${gptResponse.reasonPhrase}"
+      );
+      throw Exception('Failed to get response from OpenAI API as $gptResponse');
     }
   }
 }

@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sitemark/myApp.dart';
 import 'firebase_options.dart';
-import 'navDrawer.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 @pragma('vm:entry-point')
@@ -17,6 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await dotenv.load(fileName: 'env/main.env');
   runApp(const MyApp());
 }
 

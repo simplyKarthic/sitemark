@@ -131,6 +131,7 @@ class _MyWidgetState extends State<ChatWithGpt> {
                           text: myMessage.text
                       );
                       _getResponseFromAPI(myMessage.text, userProfileData.chatGptId, user.uid);
+                      myMessage.clear();
                     },
                     child: Icon(Icons.send,color: Colors.white70,size: 18,),
                     backgroundColor: color1,

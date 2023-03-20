@@ -78,16 +78,16 @@ class _entryScreenState extends State<entryScreen> {
                 Text(
                   'Welcome to ThreadTalk!',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.openSans(color: Colors.white, fontSize: 25),
+                  style: GoogleFonts.openSans(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 30),
                 Text(
                   'To begin chatting and discovering new connections, please login or register.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.openSans(color: Colors.white, fontSize: 14),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: 40,
                 ),
                 _buildTextField(emailController, Icons.email, 'Email'),
                 SizedBox(height: 20),
